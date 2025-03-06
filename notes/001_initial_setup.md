@@ -62,9 +62,27 @@ To
 import { id, init, InstaQLEntity } from "@instantdb/react";
 import schema from "../instant.schema";
 
-const db = init({ appId: process.env.NEXT_PUBLIC_INSTANT_APP_ID!, schema });
-
 type Todo = InstaQLEntity<typeof schema, "todos">;
+
+const db = init({ appId: process.env.NEXT_PUBLIC_INSTANT_APP_ID!, schema });
+```
+
+Because I have the schema in a separate file now I need to add the todos entity
+to `instant.schema.ts`
+
+```typescript
+todos: i.entity({
+  text: i.string(),
+  done: i.boolean(),
+  createdAt: i.number(),
+}),
+```
+
+I then push up the schema changes (technically optional, because the schema will
+be created on the fly if it doesn't exist, but this is still a good practice)
+
+```bash
+npx instant-cli@latest push
 ```
 
 Now everything works as expected and we have a starting todo app
