@@ -164,16 +164,16 @@ export default function BlogPostView({ postId }: BlogPostViewProps) {
         <div className="border-t pt-4 mt-8">
           <div className="flex justify-between">
             <div>
-              {prevPost && (
-                <Link href={`/posts/${prevPost.id}`} className="text-blue-500 hover:underline">
-                  ← {prevPost.title}
+              {nextPost && (
+                <Link href={`/posts/${nextPost.id}`} className="text-blue-500 hover:underline">
+                  ← {nextPost.title}
                 </Link>
               )}
             </div>
             <div>
-              {nextPost && (
-                <Link href={`/posts/${nextPost.id}`} className="text-blue-500 hover:underline">
-                  {nextPost.title} →
+              {prevPost && (
+                <Link href={`/posts/${prevPost.id}`} className="text-blue-500 hover:underline">
+                  {prevPost.title} →
                 </Link>
               )}
             </div>
