@@ -1,3 +1,4 @@
+// app/layout.tsx
 import './globals.css';
 import { Inter } from 'next/font/google';
 import Link from 'next/link';
@@ -18,7 +19,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <header className="bg-gray-800 text-white p-4">
-          <div className="container mx-auto">
+          <div className="container mx-auto flex justify-between items-center">
             <Link href="/" className="text-2xl font-bold">
               My Blog Platform
             </Link>
