@@ -725,8 +725,6 @@ Or set defaults for all namespaces:
 }
 ```
 
-
-
 ## Writing Data in React
 
 Instant uses a Firebase-inspired interface for mutations. We call our mutation language InstaML
