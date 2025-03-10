@@ -322,7 +322,7 @@ Here's a complete schema for a blog application:
 
 ```typescript
 // instant.schema.ts
-import { i } from '@instantdb/core';
+import { i } from '@instantdb/react';
 
 const _schema = i.schema({
   entities: {

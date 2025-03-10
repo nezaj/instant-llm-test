@@ -25,9 +25,7 @@ you should only use `@instantdb/core`
 If you want to use Instant on the backend with a different language like python you can also use the HTTP API
 which is described in another section below.
 
-# Using Instant with React
-
-## Basic Initialization
+# Basic Initialization
 
 The first step to using Instant in your app is to call `init`. Here is a simple
 example at the root of your app.
@@ -35,16 +33,23 @@ example at the root of your app.
 ```javascript
 import { init } from '@instantdb/react';
 
-// Instant app
-// Users can get their app ID from the Instant dashboard at
-// https://instantdb.com
-const APP_ID = '__APP_ID__';
-
-const db = init({ appId: APP_ID });
+const db = init({ appId: process.env.INSTANT_APP_ID! });
 
 function App() {
   return <Main />;
 }
+```
+
+## Typesafety
+
+If you're using typescript, `init` accepts a `schema` argument. Adding a schema provides auto-completion and typesafety for your queries and transactions.
+This can be useful for ensuring that your queries and transactions are correct
+
+```typescript
+import { init } from '@instantdb/react';
+import schema from '../instant.schema';
+
+const db = init({ appId: process.env.INSTANT_APP_ID, schema });
 ```
 
 ## Flexible Initialization
@@ -56,38 +61,17 @@ performance overhead. However we do recommend the pattern of exporting a
 reference from a utility file like so:
 
 ```javascript
-// util/instant.js
+// lib/db.js
 import { init } from '@instantdb/react';
+import schema from '../instant.schema';
 
-const APP_ID = '__APP_ID__';
-export const db = init({ appId: APP_ID });
-```
-
-## Typesafety
-
-If you're using typescript, `init` accepts a `schema` argument. Adding a schema provides auto-completion and typesafety for your queries and transactions.
-This can be useful for ensuring that your queries and transactions are correct
-
-```typescript
-import { init, i } from '@instantdb/react';
-
-// Instant app
-const APP_ID = '__APP_ID__';
-
-const schema = i.schema({
-  entities: {
-    todos: i.entity({
-      text: i.string(),
-      done: i.boolean(),
-      createdAt: i.number(),
-    }),
-  },
+export const db = init({
+  appId: process.env.INSTANT_APP_ID!,
+  schema
 });
-
-const db = init({ appId: APP_ID, schema });
 ```
 
-## Modeling data with schema
+# Modeling data with schema
 
 In this section we’ll learn how to model data using Instant's schema. By the end of this section you’ll know how to:
 
@@ -103,7 +87,7 @@ Below is an example schema file for our micro-blog
 
 ```typescript
 // instant.schema.ts
-import { i } from '@instantdb/core';
+import { i } from '@instantdb/react';
 
 const _schema = i.schema({
   entities: {
@@ -162,7 +146,7 @@ export default schema;
 
 Let's unpack what we just wrote. There are three core building blocks to model data with Instant: **Namespaces**, **Attributes**, and **Links**.
 
-### Namespaces
+## Namespaces
 
 Namespaces are equivelant to "tables" in relational databases or "collections" in NoSQL. In our case, these are: `$users`, `profiles`, `posts`, `comments`, and `tags`.
 
@@ -180,15 +164,13 @@ const _schema = i.schema({
 });
 ```
 
-###
-
-### Restrictions on namespaces
+## Restrictions on namespaces
 
 Namespaces must be alphanumeric and can contain underscores. They cannot contain
 spaces. Namespaces must also be unique. Namespaces that start with `$` are
 reserved for system namespaces. You can use system namespaces for queries and transactions but you should not create your own namespaces that start with `$`.
 
-### Attributes
+## Attributes
 
 Attributes are properties associated with namespaces. These are equivelant to a "column" in relational databases or a "field" in NoSQL. For the `posts` entity, we have the `title`, `body`, and `createdAt` attributes:
 
@@ -207,7 +189,7 @@ const _schema = i.schema({
 });
 ```
 
-### Typing attributes
+## Typing attributes
 
 Attributes can be typed as `i.string()`, `i.number()`, `i.boolean()`, `i.date()`, `i.json()`, or `i.any()`.
 
@@ -231,7 +213,7 @@ const _schema = i.schema({
 
 Instant will _make sure_ that all `title` attributes are strings, and you'll get the proper typescript hints to boot!
 
-### Unique constraints
+## Unique constraints
 
 Sometimes you'll want to introduce a unique constraint. For example, say we wanted to add friendly URL's to posts. We could introduce a `slug` attribute:
 
@@ -266,7 +248,7 @@ const query = {
 };
 ```
 
-### Indexing attributes
+## Indexing attributes
 
 Speaking of fast queries, let's take a look at one:
 
@@ -297,7 +279,7 @@ const _schema = i.schema({
 
 This tells Instant to index the `createdAt` field, which lets us quickly look up entities by this attribute.
 
-### Links
+## Links
 
 Links connect two namespaces together. When you define a link, you define it both in the 'forward', and the 'reverse' direction. For example:
 
@@ -341,7 +323,7 @@ Our micro-blog example has the following relationship types:
 - **One-to-many** between `comments` and `profiles`
 - **Many-to-many** between `posts` and `tags`
 
-### Restrictions on links
+## Restrictions on links
 
 Link names must be unique. You cannot have two links with the same name. Links must
 also be alphanumeric and can contain underscores. They cannot contain spaces.
@@ -350,9 +332,9 @@ You can link entities to themselves and you can link the same entities more than
 once as long as the link names are different and the labels in the forward and
 reverse directions do not conflict.
 
-❌ You CANNOT define the same attribute more than once on an entity.
 
 ```
+// ❌ You CANNOT define the same attribute more than once on an entity.
 postAuthor: {
   forward: { on: "posts", has: "one", label: "author" },
   // This creates a `posts` attribute on `profiles`
@@ -366,9 +348,8 @@ postEditor: {
 },
 ```
 
-✅ You must have different attributes on an entity.
-
 ```
+// ✅ You must have different attributes on an entity.
 postAuthor: {
   forward: { on: "posts", has: "one", label: "author" },
   // This creates an `authoredPosts` attribute on `profiles`
@@ -382,13 +363,14 @@ postEditor: {
   reverse: { on: "profiles", has: "many", label: "editedPosts" },
 },
 
+```
 
 You can link to system namespaces like `$users` but you MUST have the system
 namespace in the reverse direction of the link.
 
-❌ You CANNOT link to system namespaces in the forward direction of a link.
 
 ```
+// ❌ You CANNOT link to system namespaces in the forward direction of a link.
 
 profileUser: {
 forward: { on: '$users', has: 'one', label: 'profile' },
@@ -397,18 +379,17 @@ forward: { on: '$users', has: 'one', label: 'profile' },
 
 ```
 
-✅ You can link to system namespaces in the reverse direction of a link.
-
 ```
+// ✅ You can link to system namespaces in the reverse direction of a link.
 
 profileUser: {
 forward: { on: 'profiles', has: 'one', label: '$user' },
   reverse: { on: '$users', has: 'one', label: 'profile' },
 },
 
-````
+```
 
-### Cascade Delete
+## Cascade Delete
 
 Links defined with `has: "one"` can set `onDelete: "cascade"`. In this case, when the profile entity is deleted, all post entities will be deleted too:
 
@@ -420,7 +401,7 @@ postAuthor: {
 
 // this will delete profile and all linked posts
 db.tx.profiles[user_id].delete();
-````
+```
 
 Without `onDelete: "cascade"`, deleting a profile would simply delete the links but not delete the underlying posts.
 
@@ -433,12 +414,12 @@ postAuthor: {
 }
 ```
 
-### Publishing schema
+## Publishing schema
 
 Once you've defined your schema, the user will need to publish it to Instant
 with the cli. More info on this in the Instant CLi section.
 
-### Renaming and deleting attributes
+## Renaming and deleting attributes
 
 You can always modify or delete attributes after creating them. **You can't use the CLI to do this yet thought, but you can tell the user to use the dashboard.**
 
@@ -453,17 +434,17 @@ by directing a user to
 
 From there they will see a modal that can use to rename the attribute, index it, or delete it.
 
-## Using Permissions to secure schema and data
+# Using Permissions to secure schema and data
 
 InstantDB's permissions language is built on Google's Common Expression Language
 (CEL), enhanced with additional capabilities for managing data access control.
 This section shows how to write permission rules, with examples and common pitfalls to avoid.
 
-### Core Permissions Concepts
+## Core Permissions Concepts
 
 InstantDB permissions are boolean expressions that determine who can access what data. Each permission rule evaluates to either `true` or `false`, controlling whether operations like viewing, creating, updating, or deleting data are allowed.
 
-### Permission Structure
+## Permission Structure
 
 Permissions are organized by namespace (data type) and operation:
 
@@ -481,16 +462,16 @@ Permissions are organized by namespace (data type) and operation:
 }
 ```
 
-### Available Operations
+## Available Operations
 
 - `view`: Controls who can read data (used in `db.useQuery`)
 - `create`: Controls who can create new data
 - `update`: Controls who can modify existing data
 - `delete`: Controls who can remove data
 
-### Key Objects Available in Rules
+## Key Objects Available in Rules
 
-#### `data`
+### `data`
 
 The object being accessed. Contains all its fields and properties.
 
@@ -499,7 +480,7 @@ The object being accessed. Contains all its fields and properties.
 "view": "data.isPublic == true"
 ```
 
-#### `newData`
+### `newData`
 
 Available only in `update` rules. Contains the fields being updated.
 
@@ -508,7 +489,7 @@ Available only in `update` rules. Contains the fields being updated.
 "update": "newData.title != data.title"
 ```
 
-#### `auth`
+### `auth`
 
 The authenticated user's information.
 
@@ -520,9 +501,9 @@ The authenticated user's information.
 "view": "auth.email.endsWith('@mycompany.com')"
 ```
 
-### Special Functions
+## Special Functions
 
-#### `ref`
+### `ref`
 
 The `ref` function allows you to navigate relationships between objects.
 
@@ -534,13 +515,13 @@ The `ref` function allows you to navigate relationships between objects.
 "delete": "'admin' in auth.ref('$user.role.type')"
 ```
 
-##### Important Notes about `ref`:
+#### Important Notes about `ref`:
 
 1. When used with `auth`, paths must start with `$user.` to indicate user relationship traversal
 2. Returns a list of values, which is why you often use operators like `in`
 3. Can navigate multiple relationships with dot notation (e.g., `'users.teams.name'`)
 
-#### `bind`
+### `bind`
 
 Allows you to create aliases for complex expressions:
 
@@ -558,9 +539,9 @@ Allows you to create aliases for complex expressions:
 
 The `bind` array consists of pairs: the name to bind and the expression it represents.
 
-### Operators and Common Patterns
+## Operators and Common Patterns
 
-#### Logical Operators
+### Logical Operators
 
 ```javascript
 // AND
@@ -573,7 +554,7 @@ The `bind` array consists of pairs: the name to bind and the expression it repre
 "view": "!(data.isPrivate == true)"
 ```
 
-#### Collection Operators
+### Collection Operators
 
 ```javascript
 // Check if value exists in a collection
@@ -589,7 +570,7 @@ The `bind` array consists of pairs: the name to bind and the expression it repre
 "update": "data.ref('admins.id').exists_one(x, x == auth.id)"
 ```
 
-### Default Permissions
+## Default Permissions
 
 By default, all permissions are `true`. You can set defaults for all operations:
 
@@ -613,9 +594,9 @@ Or set defaults for all namespaces:
 }
 ```
 
-### Common Patterns
+## Common Patterns
 
-#### Owner-based permissions
+### Owner-based permissions
 
 ```javascript
 "todos": {
@@ -627,7 +608,7 @@ Or set defaults for all namespaces:
 }
 ```
 
-#### Role-based permissions
+### Role-based permissions
 
 ```javascript
 "documents": {
@@ -642,7 +623,7 @@ Or set defaults for all namespaces:
 }
 ```
 
-#### Team/group permissions
+### Team/group permissions
 
 ```javascript
 "projects": {
@@ -652,9 +633,9 @@ Or set defaults for all namespaces:
 }
 ```
 
-### Common Pitfalls and Mistakes
+## Common Pitfalls and Mistakes
 
-#### ❌ Missing `$user` prefix with `auth.ref`
+### ❌ Missing `$user` prefix with `auth.ref`
 
 ```javascript
 // Incorrect - auth.ref must use the $user prefix
@@ -664,7 +645,7 @@ Or set defaults for all namespaces:
 "delete": "'admin' in auth.ref('$user.roles.name')"
 ```
 
-#### ❌ Using complex expressions directly in `ref`
+### ❌ Using complex expressions directly in `ref`
 
 ```javascript
 // Incorrect - ref arguments must be string literals
@@ -674,7 +655,7 @@ Or set defaults for all namespaces:
 "view": "auth.id in data.ref('team.members.id')"
 ```
 
-#### ❌ Not using collection operators properly
+### ❌ Not using collection operators properly
 
 ```javascript
 // Incorrect - cannot use == with a list
@@ -684,7 +665,7 @@ Or set defaults for all namespaces:
 "view": "auth.id in data.ref('admins.id')"
 ```
 
-#### ❌ Using wrong comparison types
+### ❌ Using wrong comparison types
 
 ```javascript
 // Incorrect - comparing string to number without conversion
@@ -694,9 +675,9 @@ Or set defaults for all namespaces:
 "view": "data.count == 5" 
 ```
 
-### Advanced Examples
+## Advanced Examples
 
-#### Conditional field-level permissions
+### Conditional field-level permissions
 
 ```javascript
 "users": {
@@ -711,7 +692,7 @@ Or set defaults for all namespaces:
 }
 ```
 
-#### Permission based on data values
+### Permission based on data values
 
 ```javascript
 "posts": {
@@ -725,11 +706,11 @@ Or set defaults for all namespaces:
 }
 ```
 
-## Writing Data in React
+# Writing Data in React
 
 Instant uses a Firebase-inspired interface for mutations. We call our mutation language InstaML
 
-### Create data
+## Create data
 
 ❌ DO NOT use `create` to create entities.
 
@@ -774,7 +755,7 @@ db.transact(
 );
 ```
 
-### Update data
+## Update data
 
 The `update` action is also used for updating entities. Suppose we had created the following goal
 
@@ -793,7 +774,7 @@ db.transact(db.tx.goals[eatId].update({ lastTimeEaten: 'Today' }));
 
 This will only update the value of the `lastTimeEaten` attribute for entity `eat`.
 
-### Merge data
+## Merge data
 
 When you `update` an attribute, you overwrite it. This is fine for updating
 values of strings, numbers, and booleans. But if you use `update` to overwrite
@@ -1004,7 +985,8 @@ function ActionBar({ todos }: { todos: Todo[] }) {
 }
 
 export default App;
-### Delete data
+
+## Delete data
 
 The `delete` action is used for deleting entities.
 
@@ -1024,7 +1006,7 @@ db.transact(goals.map((g) => db.tx.goals[g.id].delete()));
 
 Calling `delete` on an entity also deletes its associations. So no need to worry about cleaning up previously created links.
 
-### Link data
+## Link data
 
 `link` is used to create associations.
 
@@ -1086,7 +1068,7 @@ console.log('goals with nested todos', goals);
 console.log('todos with nested goals', todos);
 ```
 
-### Unlink data
+## Unlink data
 
 Links can be removed via `unlink.`
 
@@ -1109,7 +1091,7 @@ db.transact([
 ]);
 ```
 
-### Lookup by unique attribute
+## Lookup by unique attribute
 
 If your entity has a unique attribute, you can use `lookup` in place of the id to perform updates.
 
@@ -1129,7 +1111,7 @@ When it is used in a transaction, the updates will be applied to the entity that
 
 It can be used with `update`, `delete`, `merge`, `link`, and `unlink`.
 
-### Lookups in links
+## Lookups in links
 
 When used with links, it can also be used in place of the linked entity's id.
 
@@ -1141,12 +1123,12 @@ db.transact(
 );
 ```
 
-### Transacts are atomic
+## Transacts are atomic
 
 When you call `db.transact`, all the transactions are committed atomically. If
 any of the transactions fail, none of them will be committed.
 
-### Batching transactions
+## Batching transactions
 
 If you have a large number of transactions to commit, you'll want to batch them
 to avoid hitting transaction limits and time outs.
@@ -1185,7 +1167,7 @@ const createGoals = async (total) => {
 };
 ```
 
-### Using the tx proxy object
+## Using the tx proxy object
 
 `db.tx` is a proxy object which creates transaction chunks to be committed via `db.transact`. It follows the format
 
@@ -1206,11 +1188,11 @@ This specifies the full api of `db.tx`, the only valid actions are `update`,
 `merge`, `delete`, `link`, and `unlink`. DO NOT hallucinate that there is a
 `create` method.
 
-## Reading Data in React
+# Reading Data in React
 
 Instant uses a declarative syntax for querying. It's like GraphQL without the configuration. Here's how you can query data with **InstaQL.**
 
-### Fetch namespace
+## Fetch namespace
 
 One of the simplest queries you can write is to simply get all entities of a namespace.
 
@@ -1253,7 +1235,7 @@ For comparison, the SQL equivalent of this would be something like:
 const data = { goals: doSQL('SELECT * FROM goals') };
 ```
 
-### Fetch multiple namespaces
+## Fetch multiple namespaces
 
 You can fetch multiple namespaces at once:
 
@@ -1291,7 +1273,7 @@ const data = {
 };
 ```
 
-### Fetch a specific entity
+## Fetch a specific entity
 
 If you want to filter entities, you can use the `where` keyword. Here we fetch a specific goal
 
@@ -1326,7 +1308,7 @@ The SQL equivalent would be:
 const data = { goals: doSQL("SELECT * FROM goals WHERE id = 'healthId'") };
 ```
 
-### Fetch associations
+## Fetch associations
 
 We can fetch goals and their related todos.
 
@@ -1359,7 +1341,7 @@ console.log(data)
 }
 ```
 
-### Comparing with SQL
+## Comparing with SQL
 
 The SQL equivalent for this would be something along the lines of:
 
@@ -1400,7 +1382,7 @@ const { isLoading, error, data } = db.useQuery(query);
 
 Modern applications often need to render nested relations, `InstaQL` really starts to shine for these use cases.
 
-### Fetch associations for filtered namespace
+## Fetch associations for filtered namespace
 
 We can fetch a specific entity in a namespace as well as it's related associations.
 
@@ -1446,7 +1428,7 @@ console.log(data)
 }
 ```
 
-### Filter namespace by associated values
+## Filter namespace by associated values
 
 We can filter namespaces **by their associations**
 
@@ -1492,7 +1474,7 @@ console.log(data)
 }
 ```
 
-### Filter associations
+## Filter associations
 
 We can also filter associated data.
 
@@ -1536,7 +1518,7 @@ console.log(data)
 }
 ```
 
-### Query inverse associations
+## Query inverse associations
 
 Associations are also available in the reverse order. In the previous example,
 we queried goals and their todos. We can also query todos and their goals.
@@ -1569,7 +1551,7 @@ console.log(data)
 }
 ```
 
-### Defer queries
+## Defer queries
 
 You can also defer queries until a condition is met. This is useful when you
 need to wait for some data to be available before you can run your query. Here's
@@ -1599,7 +1581,7 @@ const {
 );
 ```
 
-### Pagination
+## Pagination
 
 You can limit the number of items from a top level namespace by adding a `limit` to the option map:
 
@@ -1618,7 +1600,7 @@ const { isLoading, error, data, pageInfo } = db.useQuery(query);
 Instant supports both offset-based and cursor-based pagination for top-level
 namespaces.
 
-#### Offset
+### Offset
 
 To get the next page, you can use an offset:
 
@@ -1667,7 +1649,7 @@ const loadPreviousPage = () => {
 };
 ```
 
-#### Cursors
+### Cursors
 
 You can also get the next page with the `endCursor` returned in the `pageInfo` map from the previous result:
 
@@ -1733,7 +1715,7 @@ const loadPreviousPage = () => {
 };
 ```
 
-#### Ordering
+### Ordering
 
 The default ordering is by the time the objects were created, in ascending order. You can change the order with the `order` key in the option map for top-level namespaces:
 
@@ -1755,11 +1737,11 @@ The `serverCreatedAt` field is a reserved key that orders by the time that the o
 
 You can also order by any attribute that is indexed and has a checked type.
 
-### Advanced filtering
+## Advanced filtering
 
 Below are some examples of additional capaibilities of the query language.
 
-#### Multiple `where` conditions
+### Multiple `where` conditions
 
 The `where` clause supports multiple keys which will filter entities that match all of the conditions.
 
@@ -1790,7 +1772,7 @@ console.log(data)
 }
 ```
 
-#### And
+### And
 
 The `where` clause supports `and` queries which are useful when you want to filter entities that match multiple associated values.
 
@@ -1824,7 +1806,7 @@ console.log(data)
 }
 ```
 
-#### OR
+### OR
 
 The `where` clause supports `or` queries that will filter entities that match any of the clauses in the provided list:
 
@@ -1857,7 +1839,7 @@ console.log(data);
 }
 ```
 
-#### $in
+### $in
 
 The `where` clause supports `$in` queries that will filter entities that match any of the items in the provided list.
 You can think of this as a shorthand for `or` on a single key.
@@ -1891,7 +1873,7 @@ console.log(data)
 }
 ```
 
-#### Comparison operators
+### Comparison operators
 
 The `where` clause supports comparison operators on fields that are indexed and have checked types.
 
@@ -1996,7 +1978,7 @@ console.log(error);
 }
 ```
 
-#### $not
+### $not
 
 The `where` clause supports `$not` queries that will return entities that don't
 match the provided value for the field, including entities where the field is null or undefined.
@@ -2036,7 +2018,7 @@ console.log(data)
 }
 ```
 
-#### $isNull
+### $isNull
 
 The `where` clause supports `$isNull` queries that will filters entities by whether the field value is either null or undefined.
 
@@ -2100,7 +2082,7 @@ console.log(data)
 }
 ```
 
-#### $like
+### $like
 
 The `where` clause supports `$like` on fields that are indexed with a checked `string` type.
 
@@ -2206,7 +2188,7 @@ console.log(data)
 }
 ```
 
-### Select fields
+## Select fields
 
 An InstaQL query will fetch all fields for each object.
 
@@ -2280,7 +2262,7 @@ amount of data that needs to be transferred from the server and minimizes the
 number of re-renders in your React application if there are no changes to your
 selected fields.
 
-### Utility Types
+## Utility Types
 
 Instant also comes with some utility types to help you use your schema in TypeScript.
 
@@ -2320,7 +2302,7 @@ You can specify links relative to your entity:
 type TodoWithGoals = InstaQLEntity<AppSchema, 'todos', { goals: {} }>;
 ```
 
-### Query once
+## Query once
 
 Sometimes, you don't want a subscription, and just want to fetch data once. For example, you might want to fetch data before rendering a page or check whether a user name is available.
 
@@ -2350,7 +2332,7 @@ const { data, pageInfo } = await db.queryOnce(query);
 // pageInfo behaves the same as with useQuery
 ```
 
-## Instant on the server
+# Instant on the server
 
 You can use Instant on the server as well! This can be especially useful for
 running scripts, custom auth flows, or sensitive application logic.
@@ -2359,7 +2341,7 @@ We currently offer a javascript library `@instantdb/admin` for using Instant in
 a non-browser context. This library is similar to our client SDK with a few
 tweaks. MAKE SURE to use the `admin` version of the library in server contexts.
 
-### init on the backend
+## init on the backend
 
 Similar to `@instantdb/react`, you must `init` before doing any queries or
 writes. Running `init` authenticates you against our admin API. In addition to
@@ -2378,7 +2360,7 @@ Exposing `appId` in source control is fine but it's not safe
 to expose your admin token. Permission checks will not run for queries and
 writes from our admin API.
 
-### Reading data on the backend
+## Reading data on the backend
 
 In react we use `db.useQuery` to enable "live queries", queries that will
 automatically update when data changes.
@@ -2391,7 +2373,7 @@ const data = await db.query({ goals: {}, todos: {} });
 const { goals, todos } = data;
 ```
 
-### Writing data on the backend
+## Writing data on the backend
 
 `db.transact` is an async function that behaves functionally identical to `db.transact`
 from `@instantdb/react`. It returns a `tx-id` on success.
@@ -2401,7 +2383,7 @@ const res = await db.transact([db.tx.todos[id()].update({ title: 'Get fit' })]);
 console.log('New todo entry made for with tx-id', res['tx-id']);
 ```
 
-### Using schema on the backend
+## Using schema on the backend
 
 It's good practice to use the schema in your backend code as well. This will add
 type-safety to `db.query` and `db.transact`.
@@ -2417,7 +2399,7 @@ const db = init({
 });
 ```
 
-### Impersonating users on the backend
+## Impersonating users on the backend
 
 When you use the admin SDK, you can make _any_ query or transaction. As an admin, you bypass permissions.
 But, sometimes you want to make queries on behalf of your users, and would like to respect permissions.
@@ -2436,7 +2418,7 @@ const scopedDb = db.asUser({ guest: true });
 await scopedDb.query({ logs: {} });
 ```
 
-### Retrieve a user on the backend
+## Retrieve a user on the backend
 
 As an admin, you can retrieve an app user record by `email`, `id`, or `refresh_token`. You can do this with the `db.auth.getUser` function.
 
@@ -2450,7 +2432,7 @@ const user = await db.auth.getUser({
 });
 ```
 
-### Delete a user on the backend
+## Delete a user on the backend
 
 You can also delete an app user record by `email`, `id`, or `refresh_token`. You can do this with the `db.auth.deleteUser` function.
 
