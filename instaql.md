@@ -568,6 +568,67 @@ const query = {
 };
 ```
 
+## Defer queries
+
+You can also defer queries until a condition is met. This is useful when you
+need to wait for some data to be available before you can run your query. Here's
+an example of deferring a fetch for todos until a user is logged in.
+
+```javascript
+const { isLoading, user, error } = db.useAuth();
+
+const {
+  isLoading: isLoadingTodos,
+  error,
+  data,
+} = db.useQuery(
+  user
+    ? {
+        // The query will run once user is populated
+        todos: {
+          $: {
+            where: {
+              userId: user.id,
+            },
+          },
+        },
+      }
+    : // Otherwise skip the query, which sets `isLoading` to true
+      null,
+);
+```
+
+## Query once
+
+Sometimes, you don't want a subscription, and just want to fetch data once. For example, you might want to fetch data before rendering a page or check whether a user name is available.
+
+In these cases, you can use `queryOnce` instead of `useQuery`. `queryOnce` returns a promise that resolves with the data once the query is complete.
+
+Unlike `useQuery`, `queryOnce` will throw an error if the user is offline. This is because `queryOnce` is intended for use cases where you need the most up-to-date data.
+
+```javascript
+const query = { todos: {} };
+const { data } = await db.queryOnce(query);
+// returns the same data as useQuery, but without the isLoading and error fields
+```
+
+You can also do pagination with `queryOnce`:
+
+```javascript
+const query = {
+  todos: {
+    $: {
+      limit: 10,
+      offset: 10,
+    },
+  },
+};
+
+const { data, pageInfo } = await db.queryOnce(query);
+// pageInfo behaves the same as with useQuery
+```
+
+
 ## Combining Features
 
 You can combine these features to create powerful queries:
