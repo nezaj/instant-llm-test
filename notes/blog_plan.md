@@ -26,7 +26,7 @@ We're going to create a simple blogging platform with Next.js, React, and Instan
       cannot be navigated to from the next and previous post links
 
 - [ ] Users can add social links (twitter, github, etc) which are displayed on their
-  profile page
+  blog index page
     - [ ] Social links are displayed on the users blog index page
     - [ ] Users can edit their social links
     - [ ] Users can delete their social links
