@@ -25,12 +25,12 @@ We're going to create a simple blogging platform with Next.js, React, and Instan
       the next post is a draft, it won't show up in the paginated list and
       cannot be navigated to from the next and previous post links
 
-- [ ] Users can add social links (twitter, github, etc) which are displayed on their
+- [x] Users can add social links (twitter, github, etc) which are displayed on their
   blog index page
-    - [ ] Social links are displayed on the users blog index page
-    - [ ] Users can edit their social links
-    - [ ] Users can delete their social links
-    - [ ] Permissions are set so that users can only edit their own social links
+    - [x] Social links are displayed on the users blog index page
+    - [x] Users can edit their social links
+    - [x] Users can delete their social links
+    - [x] Permissions are set so that users can only edit their own social links
 
 - [ ] Users can upload a profile picture which is displayed on their profile page
     - [ ] Profile picture is displayed on the users blog index page
