@@ -12,16 +12,16 @@ We're going to create a simple blogging platform with Next.js, React, and Instan
 - [x] After signing up users create a profile with their handle and a short bio
 - [x] After signing up three example blog posts are created for the users
 
-- [ ] Be able to mark their posts as published or draft
-    - [ ] Draft posts are only visible to the author
-    - [ ] Draft posts don't show up in the paginated list
-    - [ ] Draft posts cannot be navigated to from the next and previous post links
+- [x] Be able to mark their posts as published or draft
+    - [x] Draft posts are only visible to the author
+    - [x] Draft posts don't show up in the paginated list
+    - [x] Draft posts cannot be navigated to from the next and previous post links
 
-- [ ] Users can see a page with links to other users' blogs
-- [ ] Users can see another users blog posts as a paginated list
-- [ ] Users can see a single blog post from another user
-    - [ ] Navigate to the next and previous post
-    - [ ] Navigation respects the published/draft status of the posts, i.e. if
+- [x] Users can see a page with links to other users' blogs
+- [x] Users can see another users blog posts as a paginated list
+- [x] Users can see a single blog post from another user
+    - [x] Navigate to the next and previous post
+    - [x] Navigation respects the published/draft status of the posts, i.e. if
       the next post is a draft, it won't show up in the paginated list and
       cannot be navigated to from the next and previous post links
 
