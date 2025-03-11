@@ -1,5 +1,24 @@
-We're going to create a simple blogging platform with the following
-functionality
+We're going to create a simple blogging platform with Next.js, React, and InstantDB.
+
+## Todos
+
+- [x] Create, edit, and delete blog posts
+- [x] View their blog posts in a paginated list
+- [x] View a single blog post
+    - [x] Navigate to the next and previous post
+
+- [x] Users can sign up for an account with their email and a magic code that is
+  emailed to them
+- [x] After signing up users create a profile with their handle and a short bio
+- [x] After signing up three example blog posts are created for the users
+
+- [ ] Be able to mark their posts as published or draft
+    - [ ] Draft posts are only visible to the author
+    - [ ] Draft posts don't show up in the paginated list
+    - [ ] Draft posts cannot be navigated to from the next and previous post links
+
+- [ ] Add ability to add social links (twitter, github, etc)
+- [ ] Add ability to add a profile picture
 
 ## Basic Blog Functionality
 * Create, edit, and delete blog posts
@@ -37,7 +56,7 @@ After that we'll implement some of the profile functionality
     * We want to make sure these posts are associated with the user
     * All future posts should also be associated with the user
 
-We can then impement the ability to mark posts as private. This will require us
+We can then implement the ability to mark posts as private. This will require us
 to use permissions 
 
 * Be able to mark their posts as published or draft
