@@ -3,22 +3,30 @@
 import type { InstantRules } from "@instantdb/react";
 
 const rules = {
-  /**
-   * Welcome to Instant's permission system!
-   * Right now your rules are empty. To start filling them in, check out the docs:
-   * https://www.instantdb.com/docs/permissions
-   *
-   * Here's an example to give you a feel:
-   * posts: {
-   *   allow: {
-   *     view: "true",
-   *     create: "isOwner",
-   *     update: "isOwner",
-   *     delete: "isOwner",
-   *   },
-   *   bind: ["isOwner", "auth.id != null && auth.id == data.ownerId"],
-   * },
-   */
+  // Define permissions for the posts namespace
+  posts: {
+    allow: {
+      // Posts can be viewed if they are published or if the viewer is the author
+      view: "data.published == true || auth.id in data.ref('author.$user.id')",
+      // Only authenticated users can create posts
+      create: "auth.id != null",
+      // Only the author can update their posts
+      update: "auth.id in data.ref('author.$user.id')",
+      // Only the author can delete their posts
+      delete: "auth.id in data.ref('author.$user.id')"
+    }
+  },
+  // Define permissions for profiles
+  profiles: {
+    allow: {
+      // Profiles are public
+      view: "true",
+      // Only the owner can update their profile
+      update: "auth.id in data.ref('$user.id')",
+      // Only the owner can delete their profile
+      delete: "auth.id in data.ref('$user.id')"
+    }
+  },
 } satisfies InstantRules;
 
 export default rules;

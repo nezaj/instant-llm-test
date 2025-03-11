@@ -23,6 +23,25 @@ export default function RootLayout({
             <Link href="/" className="text-2xl font-bold">
               My Blog Platform
             </Link>
+            <nav>
+              <ul className="flex space-x-6">
+                <li>
+                  <Link href="/" className="hover:text-gray-300">
+                    My Blog
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/users" className="hover:text-gray-300">
+                    Discover Blogs
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/posts/create" className="hover:text-gray-300">
+                    Create Post
+                  </Link>
+                </li>
+              </ul>
+            </nav>
           </div>
         </header>
         <main className="py-8">{children}</main>

@@ -28,18 +28,25 @@ export default function BlogPostView({ postId }: BlogPostViewProps) {
     }
   });
 
-  // Get user's other posts for navigation (only published ones or owned by the current user)
+  // Determine if loading is complete and we have post data
+  const hasPostData = !isLoading && data?.posts?.[0];
+  const postAuthorId = hasPostData ? data.posts[0].author?.id : null;
+
+  // Get the author's other posts for navigation (using the post's author, not the current user)
+  // Only include published posts if the viewer is not the author
   const { data: postsData, isLoading: postsLoading } = db.useQuery(
-    profileData?.profiles?.[0]?.id
-      ? {
-        posts: {
-          $: {
-            where: { "author.id": profileData.profiles[0].id },
-            order: { createdAt: 'desc' }
-          }
+    hasPostData && postAuthorId ? {
+      posts: {
+        $: {
+          where: {
+            "author.id": postAuthorId,
+            // If we're not the author, only show published posts for navigation
+            ...(profileData?.profiles?.[0]?.id !== postAuthorId ? { published: true } : {})
+          },
+          order: { createdAt: 'desc' }
         }
       }
-      : null
+    } : null
   );
 
   if (authLoading || profileLoading || isLoading || postsLoading) {
@@ -51,7 +58,16 @@ export default function BlogPostView({ postId }: BlogPostViewProps) {
   }
 
   if (error) {
-    return <div className="text-red-500 p-4">Error: {error.message}</div>;
+    // Could be a permission error (trying to view someone else's draft)
+    return (
+      <div className="text-center p-8">
+        <h1 className="text-2xl font-bold mb-4">Post not available</h1>
+        <p className="mb-4">This post may be a draft or has been removed.</p>
+        <Link href="/" className="text-blue-500 hover:underline">
+          Return to Home
+        </Link>
+      </div>
+    );
   }
 
   // If the post doesn't exist
@@ -67,32 +83,20 @@ export default function BlogPostView({ postId }: BlogPostViewProps) {
   }
 
   const post = data.posts[0];
+  const authorProfile = post.author;
 
-  // Check if this is a draft post and if the user owns it
-  const isOwner = post.author && profileData?.profiles?.[0]?.id === post.author.id;
+  // Check if the current user is the author of this post
+  const isOwner = authorProfile && profileData?.profiles?.[0]?.id === authorProfile.id;
 
-  // If the post is not published and the user is not the owner, they can't view it
-  if (!post.published && !isOwner) {
-    return (
-      <div className="text-center p-8">
-        <h1 className="text-2xl font-bold mb-4">This post is not available</h1>
-        <p className="mb-4">This post is currently a draft and not published.</p>
-        <Link href="/" className="text-blue-500 hover:underline">
-          Return to Home
-        </Link>
-      </div>
-    );
-  }
+  // Get the author's posts for navigation
+  const authorPosts = postsData?.posts || [];
 
-  // Only use user's posts for navigation if they're the owner
-  const userPosts = isOwner && postsData?.posts ? postsData.posts : [];
+  // Find current post index in the author's posts
+  const currentIndex = authorPosts.findIndex(p => p.id === postId);
 
-  // Find current post index in user's posts
-  const currentIndex = userPosts.findIndex(p => p.id === postId);
-
-  // Determine next and previous post (only for the owner's navigation)
-  const nextPost = isOwner && currentIndex > 0 ? userPosts[currentIndex - 1] : null;
-  const prevPost = isOwner && currentIndex < userPosts.length - 1 ? userPosts[currentIndex + 1] : null;
+  // Determine next and previous post
+  const nextPost = currentIndex > 0 ? authorPosts[currentIndex - 1] : null;
+  const prevPost = currentIndex < authorPosts.length - 1 ? authorPosts[currentIndex + 1] : null;
 
   const handleDeletePost = async () => {
     if (!isOwner) {
@@ -114,9 +118,15 @@ export default function BlogPostView({ postId }: BlogPostViewProps) {
   return (
     <div className="container mx-auto p-4 max-w-3xl">
       <div className="flex justify-between items-center mb-6">
-        <Link href="/" className="text-blue-500 hover:underline">
-          ← Back to My Posts
-        </Link>
+        {isOwner ? (
+          <Link href="/" className="text-blue-500 hover:underline">
+            ← Back to My Posts
+          </Link>
+        ) : (
+          <Link href={`/user/${authorProfile?.handle}`} className="text-blue-500 hover:underline">
+            ← Back to @{authorProfile?.handle}'s Posts
+          </Link>
+        )}
         {user && <SignOutButton />}
       </div>
 
@@ -131,7 +141,7 @@ export default function BlogPostView({ postId }: BlogPostViewProps) {
             )}
           </div>
           <p className="text-gray-500 mt-2">
-            Published by {post.author?.handle || 'Unknown'} on {new Date(post.createdAt).toLocaleDateString()}
+            Published by {authorProfile?.handle || 'Unknown'} on {new Date(post.createdAt).toLocaleDateString()}
             {post.updatedAt !== post.createdAt &&
               ` · Updated on ${new Date(post.updatedAt).toLocaleDateString()}`}
           </p>
@@ -159,8 +169,8 @@ export default function BlogPostView({ postId }: BlogPostViewProps) {
         )}
       </article>
 
-      {/* Post Navigation - only for owner */}
-      {isOwner && (
+      {/* Post Navigation - show navigation for all author's posts that the current user can see */}
+      {authorPosts.length > 1 && (
         <div className="border-t pt-4 mt-8">
           <div className="flex justify-between">
             <div>

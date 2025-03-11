@@ -26,7 +26,11 @@ export default function BlogPostList() {
     profileData?.profiles?.[0] ? {
       posts: {
         $: {
-          where: { "author.id": profileData.profiles[0].id },
+          where: {
+            "author.id": profileData.profiles[0].id,
+            // No need for a filter here - permissions will handle visibility
+            // The author can see all their posts (drafts and published)
+          },
           limit: PAGE_SIZE,
           offset: (page - 1) * PAGE_SIZE,
           order: {

@@ -14,7 +14,7 @@ I've also included some documentation on how to use InstantDB
 ```
 
 I included my the todo app from `001_initial_setup.md` and documentation on how
-to use Instant in `extra/002_rules.md` My full chat with Claude is [here][1]
+to use Instant in `extra/002_rules.md`
 
 Claude got it mostly write but it had some type issues with `BlogPostView.tsx`
 
@@ -43,4 +43,6 @@ I told it
 
 And it then fixed it by querying for `posts` only.
 
-[1]: https://claude.ai/share/f43fbd83-1eff-474e-99a5-4117eef36dd6
+My full chat with Claude is below
+
+https://claude.ai/share/f43fbd83-1eff-474e-99a5-4117eef36dd6

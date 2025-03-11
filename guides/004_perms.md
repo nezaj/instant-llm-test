@@ -9,7 +9,6 @@ InstantDB's permission system is based on a declarative rule language that lets 
 - **Expressive**: Based on CEL (Common Expression Language)
 - **Flexible**: Allows referencing relations and user properties
 - **Code-First**: Can be defined in code or through the dashboard
-- **Secure by Default**: When properly configured, ensures data is only accessible to authorized users
 
 ## Setting Up Permissions
 
@@ -199,7 +198,10 @@ Set default rules for all namespaces:
 The most restrictive configuration:
 
 ```javascript
-// ✅ Good: Maximum security by default
+// Denies all permissions unless explicitly allowed
+// Doing this will block new namespaces from being viewed or modified
+// unless you set permissions for them, for production this can be good
+// but for development it can be annoying
 {
   "$default": {
     "allow": {
@@ -208,6 +210,8 @@ The most restrictive configuration:
   }
 }
 ```
+
+If 
 
 ## Advanced Permission Features
 

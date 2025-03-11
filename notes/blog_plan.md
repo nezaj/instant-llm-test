@@ -17,8 +17,29 @@ We're going to create a simple blogging platform with Next.js, React, and Instan
     - [ ] Draft posts don't show up in the paginated list
     - [ ] Draft posts cannot be navigated to from the next and previous post links
 
-- [ ] Add ability to add social links (twitter, github, etc)
-- [ ] Add ability to add a profile picture
+- [ ] Users can see a page with links to other users' blogs
+- [ ] Users can see another users blog posts as a paginated list
+- [ ] Users can see a single blog post from another user
+    - [ ] Navigate to the next and previous post
+    - [ ] Navigation respects the published/draft status of the posts, i.e. if
+      the next post is a draft, it won't show up in the paginated list and
+      cannot be navigated to from the next and previous post links
+
+- [ ] Users can add social links (twitter, github, etc) which are displayed on their
+  profile page
+    - [ ] Social links are displayed on the users blog index page
+    - [ ] Users can edit their social links
+    - [ ] Users can delete their social links
+    - [ ] Permissions are set so that users can only edit their own social links
+
+- [ ] Users can upload a profile picture which is displayed on their profile page
+    - [ ] Profile picture is displayed on the users blog index page
+    - [ ] Users can edit their profile picture
+    - [ ] Users can delete their profile picture
+    - [ ] When there is no profile picture, a random color and the first letter of their
+      handle is displayed. This color is generated using a hash of the handle
+    - [ ] Permissions are set so that users can only edit their own profile
+      picture
 
 ## Basic Blog Functionality
 * Create, edit, and delete blog posts
