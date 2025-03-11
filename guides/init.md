@@ -1,4 +1,4 @@
-# Basic Initialization
+# InstantDB Basic Initialization
 
 The first step to using Instant in your app is to call `init`. Here is a simple
 example at the root of your app.

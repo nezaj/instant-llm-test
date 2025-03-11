@@ -1,4 +1,4 @@
-# What is Instant
+# What is InstantDB
 
 InstantDB is a modern Firebase. InstantDB makes developers productive by giving
 them a real-time database they can use directly on their frontend database.
