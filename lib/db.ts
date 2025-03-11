@@ -36,16 +36,22 @@ export function deletePost(postId: string) {
 }
 
 // Profile functions
-export function createProfile(userId: string, handle: string, bio: string, profileId: string = id()) {
+export function createProfile(userId: string, handle: string, bio: string, profileId: string = id(), socialLinks: SocialLinks = {}) {
   return db.transact([
     db.tx.profiles[profileId].update({
       handle,
       bio,
       createdAt: Date.now(),
+      socialLinks
     }),
     // Link profile to user
     db.tx.profiles[profileId].link({ $user: userId }),
   ]);
+}
+
+// Update profile function
+export function updateProfile(profileId: string, data: { handle?: string; bio?: string; socialLinks?: SocialLinks }) {
+  return db.transact(db.tx.profiles[profileId].update(data));
 }
 
 // Function to create example posts for new users
@@ -87,6 +93,16 @@ export async function createExamplePosts(profileId: string) {
   ]);
 }
 
+// Define the structure of social links
+export interface SocialLinks {
+  twitter?: string;
+  github?: string;
+  linkedin?: string;
+  instagram?: string;
+  website?: string;
+  [key: string]: string | undefined;
+}
+
 export type Post = {
   id: string;
   title: string;
@@ -105,6 +121,7 @@ export type Profile = {
   handle: string;
   bio: string;
   createdAt: number;
+  socialLinks?: SocialLinks;
   $user?: {
     id: string;
     email: string;

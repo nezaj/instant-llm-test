@@ -10,6 +10,7 @@ const _schema = i.schema({
       handle: i.string().unique().indexed(),
       bio: i.string(),
       createdAt: i.date().indexed(),
+      socialLinks: i.json(), // Add this field to store social links
     }),
     posts: i.entity({
       title: i.string().indexed(),

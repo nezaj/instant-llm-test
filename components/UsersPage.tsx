@@ -1,8 +1,10 @@
+// components/UsersPage.tsx
 "use client";
 import { db } from '@/lib/db';
 import Link from 'next/link';
 import { useState } from 'react';
 import { SignOutButton } from '@/components/auth/AuthComponents';
+import SocialLinks from './SocialLinks';
 
 export default function UsersPage() {
   const { isLoading: authLoading, user, error: authError } = db.useAuth();
@@ -99,6 +101,14 @@ export default function UsersPage() {
               <p className="mb-4 line-clamp-3 text-gray-700">
                 {profile.bio}
               </p>
+
+              {/* Display social links */}
+              {profile.socialLinks && (
+                <div className="mb-4">
+                  <SocialLinks links={profile.socialLinks} />
+                </div>
+              )}
+
               {isCurrentUser ? (
                 <Link
                   href="/"

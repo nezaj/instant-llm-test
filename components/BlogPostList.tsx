@@ -1,9 +1,11 @@
+// components/BlogPostList.tsx
 "use client";
 
 import { db } from '@/lib/db';
 import { useState } from 'react';
 import Link from 'next/link';
 import { SignOutButton } from './auth/AuthComponents';
+import SocialLinks from './SocialLinks';
 
 export default function BlogPostList() {
   const { isLoading: authLoading, user, error: authError } = db.useAuth();
@@ -73,7 +75,20 @@ export default function BlogPostList() {
     return (
       <div className="container mx-auto p-4">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold">My Blog</h1>
+          <div>
+            <h1 className="text-3xl font-bold">My Blog</h1>
+            <p className="text-gray-600">Welcome, @{profile.handle}</p>
+
+            {/* Display social links */}
+            {profile.socialLinks && <SocialLinks links={profile.socialLinks} className="mt-2" />}
+
+            {/* Edit Profile Link */}
+            <div className="mt-2">
+              <Link href="/profile/edit" className="text-sm text-blue-500 hover:underline">
+                Edit Profile
+              </Link>
+            </div>
+          </div>
           <div className="flex items-center gap-3">
             <Link
               href="/posts/create"
@@ -104,6 +119,16 @@ export default function BlogPostList() {
         <div>
           <h1 className="text-3xl font-bold">My Blog</h1>
           <p className="text-gray-600">Welcome, @{profile.handle}</p>
+
+          {/* Display social links */}
+          {profile.socialLinks && <SocialLinks links={profile.socialLinks} className="mt-2" />}
+
+          {/* Edit Profile Link */}
+          <div className="mt-2">
+            <Link href="/profile/edit" className="text-sm text-blue-500 hover:underline">
+              Edit Profile
+            </Link>
+          </div>
         </div>
         <div className="flex items-center gap-3">
           <Link

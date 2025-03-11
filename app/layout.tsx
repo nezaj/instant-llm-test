@@ -40,6 +40,11 @@ export default function RootLayout({
                     Create Post
                   </Link>
                 </li>
+                <li>
+                  <Link href="/profile/edit" className="hover:text-gray-300">
+                    Edit Profile
+                  </Link>
+                </li>
               </ul>
             </nav>
           </div>

@@ -21,6 +21,8 @@ const rules = {
     allow: {
       // Profiles are public
       view: "true",
+      // Only the owner can create their profile
+      create: "auth.id in data.ref('$user.id')",
       // Only the owner can update their profile
       update: "auth.id in data.ref('$user.id')",
       // Only the owner can delete their profile

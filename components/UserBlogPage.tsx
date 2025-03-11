@@ -1,9 +1,11 @@
+// components/UserBlogPage.tsx
 "use client";
 import { db } from '@/lib/db';
 import Link from 'next/link';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { SignOutButton } from '@/components/auth/AuthComponents';
+import SocialLinks from '@/components/SocialLinks';
 
 interface UserBlogPageProps {
   handle: string;
@@ -104,17 +106,34 @@ export default function UserBlogPage({ handle }: UserBlogPageProps) {
         {user && <SignOutButton />}
       </div>
 
-      <div className="mb-8 flex items-center space-x-4">
-        <div
-          className="w-16 h-16 rounded-full flex items-center justify-center text-white text-2xl font-bold"
-          style={{ backgroundColor: stringToColor(profile.handle) }}
-        >
-          {profile.handle.charAt(0).toUpperCase()}
+      <div className="mb-8">
+        <div className="flex items-center space-x-4 mb-3">
+          <div
+            className="w-16 h-16 rounded-full flex items-center justify-center text-white text-2xl font-bold"
+            style={{ backgroundColor: stringToColor(profile.handle) }}
+          >
+            {profile.handle.charAt(0).toUpperCase()}
+          </div>
+          <div>
+            <h1 className="text-3xl font-bold">@{profile.handle}'s Blog</h1>
+            <p className="text-gray-600 mt-1">{profile.bio}</p>
+
+            {/* Display social links */}
+            {profile.socialLinks && <SocialLinks links={profile.socialLinks} className="mt-2" />}
+          </div>
         </div>
-        <div>
-          <h1 className="text-3xl font-bold">@{profile.handle}'s Blog</h1>
-          <p className="text-gray-600 mt-1">{profile.bio}</p>
-        </div>
+
+        {/* Edit Profile Button (only show if it's the user's own blog) */}
+        {isOwnBlog && (
+          <div className="mt-4">
+            <Link
+              href="/profile/edit"
+              className="text-sm bg-gray-100 hover:bg-gray-200 px-4 py-2 rounded border"
+            >
+              Edit Profile
+            </Link>
+          </div>
+        )}
       </div>
 
       {posts.length === 0 ? (
