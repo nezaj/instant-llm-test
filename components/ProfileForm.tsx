@@ -1,3 +1,4 @@
+// components/ProfileForm.tsx
 "use client";
 
 import { useState, FormEvent, useEffect } from "react";
@@ -76,14 +77,14 @@ export default function ProfileForm() {
 
       // Set redirection flag instead of immediate navigation
       setShouldRedirect(true);
-    } catch (err: any) {
+    } catch (err) {
       console.error("Error creating profile:", err);
 
       // Handle unique constraint error for handle
-      if (err.message?.includes("unique constraint")) {
+      if (err instanceof Error && err.message?.includes("unique constraint")) {
         setError("This handle is already taken. Please choose another one.");
       } else {
-        setError(err.message || "Failed to create profile. Please try again.");
+        setError(err instanceof Error ? err.message : "Failed to create profile. Please try again.");
       }
 
       setIsSubmitting(false);
@@ -96,7 +97,7 @@ export default function ProfileForm() {
 
       <p className="mb-6 text-gray-600">
         Welcome to the blog platform! Please create your profile to get started.
-        We'll also create some example posts for you.
+        We&apos;ll also create some example posts for you.
       </p>
 
       {error && (
@@ -143,8 +144,8 @@ export default function ProfileForm() {
           type="submit"
           disabled={isSubmitting}
           className={`w-full px-4 py-2 rounded font-medium ${isSubmitting
-              ? "bg-gray-400 cursor-not-allowed"
-              : "bg-blue-500 hover:bg-blue-600 text-white"
+            ? "bg-gray-400 cursor-not-allowed"
+            : "bg-blue-500 hover:bg-blue-600 text-white"
             }`}
         >
           {isSubmitting ? "Creating Profile..." : "Create Profile"}

@@ -170,14 +170,14 @@ export default function EditProfileForm() {
       }
 
       router.push("/");
-    } catch (err: any) {
+    } catch (err) {
       console.error("Error updating profile:", err);
 
       // Handle unique constraint error for handle
-      if (err.message?.includes("unique constraint")) {
+      if (err instanceof Error && err.message?.includes("unique constraint")) {
         setError("This handle is already taken. Please choose another one.");
       } else {
-        setError(err.message || "Failed to update profile. Please try again.");
+        setError(err instanceof Error ? err.message : "Failed to update profile. Please try again.");
       }
 
       setIsSubmitting(false);

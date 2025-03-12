@@ -22,8 +22,11 @@ export function createPost(profileId: string, title: string, content: string, pu
   ]);
 }
 
-export function updatePost(postId: string, data: { title?: string; content?: string; published?: boolean }) {
-  const updateData: any = {
+export function updatePost(
+  postId: string,
+  data: { title?: string; content?: string; published?: boolean }
+) {
+  const updateData = {
     ...data,
     updatedAt: Date.now(),
   };
@@ -36,7 +39,13 @@ export function deletePost(postId: string) {
 }
 
 // Profile functions
-export function createProfile(userId: string, handle: string, bio: string, profileId: string = id(), socialLinks: SocialLinks = {}) {
+export function createProfile(
+  userId: string,
+  handle: string,
+  bio: string,
+  profileId: string = id(),
+  socialLinks: SocialLinks = {}
+) {
   return db.transact([
     db.tx.profiles[profileId].update({
       handle,
@@ -50,7 +59,10 @@ export function createProfile(userId: string, handle: string, bio: string, profi
 }
 
 // Update profile function
-export function updateProfile(profileId: string, data: { handle?: string; bio?: string; socialLinks?: SocialLinks }) {
+export function updateProfile(
+  profileId: string,
+  data: { handle?: string; bio?: string; socialLinks?: SocialLinks }
+) {
   return db.transact(db.tx.profiles[profileId].update(data));
 }
 

@@ -135,7 +135,7 @@ export default function UserBlogPage({ handle }: UserBlogPageProps) {
             </div>
           )}
           <div>
-            <h1 className="text-3xl font-light">@{profile.handle}'s Blog</h1>
+            <h1 className="text-3xl font-light">@{profile.handle}&apos;s Blog</h1>
             <p className="text-gray-500 mt-1">{profile.bio}</p>
 
             {/* Display social links */}

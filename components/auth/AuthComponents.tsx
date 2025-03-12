@@ -1,3 +1,4 @@
+// components/auth/AuthComponents.tsx
 "use client";
 
 import React, { useState, useEffect } from "react";
@@ -107,8 +108,8 @@ function EmailStep({ onSendEmail }: { onSendEmail: (email: string) => void }) {
     try {
       await db.auth.sendMagicCode({ email });
       onSendEmail(email);
-    } catch (err: any) {
-      setError(err.body?.message || "Failed to send code. Please try again.");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to send code. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -119,8 +120,8 @@ function EmailStep({ onSendEmail }: { onSendEmail: (email: string) => void }) {
       <div>
         <h2 className="text-3xl font-light mb-2">Sign In</h2>
         <p className="text-gray-600">
-          Enter your email, and we'll send you a verification code. We'll create
-          an account for you if you don't already have one.
+          Enter your email, and we&apos;ll send you a verification code. We&apos;ll create
+          an account for you if you don&apos;t already have one.
         </p>
       </div>
 
@@ -201,8 +202,8 @@ function CodeStep({ sentEmail }: { sentEmail: string }) {
 
       setHasProfile(!!data.profiles && data.profiles.length > 0);
       setLoginSuccess(true);
-    } catch (err: any) {
-      setError(err.body?.message || "Invalid code. Please try again.");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Invalid code. Please try again.");
       setCode("");
       setIsLoading(false);
     }

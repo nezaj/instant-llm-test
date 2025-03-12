@@ -70,7 +70,7 @@ export default function BlogPostList() {
   const posts = postsData?.posts || [];
 
   const handleDeletePost = async (postId: string) => {
-    if (confirm('Are you sure you want to delete this post?')) {
+    if (confirm("Are you sure you want to delete this post?")) {
       try {
         await db.transact(db.tx.posts[postId].delete());
       } catch (err) {
@@ -126,7 +126,7 @@ export default function BlogPostList() {
         </div>
 
         <div className="p-8 text-center">
-          <p className="mb-6 text-gray-500">You don't have any blog posts yet.</p>
+          <p className="mb-6 text-gray-500">You don&apos;t have any blog posts yet.</p>
           <Link
             href="/posts/create"
             className="bg-gray-800 hover:bg-black text-white px-4 py-2 rounded-sm transition-colors"

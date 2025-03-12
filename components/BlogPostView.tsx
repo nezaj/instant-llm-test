@@ -11,10 +11,10 @@ interface BlogPostViewProps {
 
 export default function BlogPostView({ postId }: BlogPostViewProps) {
   const router = useRouter();
-  const { isLoading: authLoading, user } = db.useAuth();
+  const { user } = db.useAuth();
 
   // Get user's profile to check ownership (only if logged in)
-  const { isLoading: profileLoading, data: profileData } = db.useQuery(
+  const { data: profileData } = db.useQuery(
     user ? { profiles: { $: { where: { "$user.id": user.id } } } } : null
   );
 
@@ -33,7 +33,7 @@ export default function BlogPostView({ postId }: BlogPostViewProps) {
   const postAuthorId = hasPostData ? data.posts[0].author?.id : null;
 
   // Fix for the loading issue: Only proceed with getting related posts when we have post data
-  const { data: postsData, isLoading: postsLoading } = db.useQuery(
+  const { data: postsData } = db.useQuery(
     hasPostData && postAuthorId ? {
       posts: {
         $: {
@@ -128,7 +128,7 @@ export default function BlogPostView({ postId }: BlogPostViewProps) {
       <div className="flex justify-between items-center mb-10">
         {authorProfile ?
           <Link href={`/user/${authorProfile.handle}`} className="text-gray-500 hover:text-gray-800">
-            ← Back to @{authorProfile.handle}'s Posts
+            ← Back to @{authorProfile.handle}&apos;s Posts
           </Link>
           :
           <Link href="/users" className="text-gray-500 hover:text-gray-800">

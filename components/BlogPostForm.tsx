@@ -95,9 +95,9 @@ export default function BlogPostForm({ postId }: BlogPostFormProps) {
         await createPost(profileId, title, content, published);
       }
       router.push('/');
-    } catch (err: any) {
+    } catch (err) {
       console.error('Error saving post:', err);
-      setError(err.message || 'Failed to save post. Please try again.');
+      setError(err instanceof Error ? err.message : 'Failed to save post. Please try again.');
       setIsSubmitting(false);
     }
   };
