@@ -32,13 +32,13 @@ We're going to create a simple blogging platform with Next.js, React, and Instan
     - [x] Users can delete their social links
     - [x] Permissions are set so that users can only edit their own social links
 
-- [ ] Users can upload a profile picture which is displayed on their profile page
-    - [ ] Profile picture is displayed on the users blog index page
-    - [ ] Users can edit their profile picture
-    - [ ] Users can delete their profile picture
-    - [ ] When there is no profile picture, a random color and the first letter of their
+- [x] Users can upload a profile picture which is displayed on their profile page
+    - [x] Profile picture is displayed on the users blog index page
+    - [x] Users can edit their profile picture
+    - [x] Users can delete their profile picture
+    - [x] When there is no profile picture, a random color and the first letter of their
       handle is displayed. This color is generated using a hash of the handle
-    - [ ] Permissions are set so that users can only edit their own profile
+    - [x] Permissions are set so that users can only edit their own profile
       picture
 
 ## Basic Blog Functionality
