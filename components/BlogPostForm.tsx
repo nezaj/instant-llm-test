@@ -1,3 +1,4 @@
+// components/BlogPostForm.tsx
 "use client";
 
 import { db, createPost, updatePost } from '@/lib/db';
@@ -102,20 +103,20 @@ export default function BlogPostForm({ postId }: BlogPostFormProps) {
   };
 
   return (
-    <div className="container mx-auto p-4 max-w-2xl">
-      <h1 className="text-3xl font-bold mb-6">
+    <div className="container max-w-2xl mx-auto px-4 py-8">
+      <h1 className="text-3xl font-light mb-8">
         {postId ? 'Edit Post' : 'Create New Post'}
       </h1>
 
       {error && (
-        <div className="bg-red-50 text-red-500 p-3 rounded mb-6">
+        <div className="text-red-500 mb-6">
           {error}
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-6">
         <div>
-          <label htmlFor="title" className="block mb-1 font-semibold">
+          <label htmlFor="title" className="block mb-2 text-gray-700 font-light">
             Title
           </label>
           <input
@@ -123,21 +124,21 @@ export default function BlogPostForm({ postId }: BlogPostFormProps) {
             type="text"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            className="w-full px-3 py-2 border rounded"
+            className="w-full px-3 py-2 border border-gray-200 rounded-sm focus:outline-none focus:border-gray-400"
             required
             disabled={!!error}
           />
         </div>
 
         <div>
-          <label htmlFor="content" className="block mb-1 font-semibold">
+          <label htmlFor="content" className="block mb-2 text-gray-700 font-light">
             Content
           </label>
           <textarea
             id="content"
             value={content}
             onChange={(e) => setContent(e.target.value)}
-            className="w-full px-3 py-2 border rounded min-h-[300px]"
+            className="w-full px-3 py-2 border border-gray-200 rounded-sm focus:outline-none focus:border-gray-400 min-h-[300px]"
             required
             disabled={!!error}
           />
@@ -152,7 +153,7 @@ export default function BlogPostForm({ postId }: BlogPostFormProps) {
             className="mr-2"
             disabled={!!error}
           />
-          <label htmlFor="published" className="font-medium">
+          <label htmlFor="published" className="text-gray-700">
             Publish post
           </label>
           <span className="ml-2 text-sm text-gray-500">
@@ -160,14 +161,13 @@ export default function BlogPostForm({ postId }: BlogPostFormProps) {
           </span>
         </div>
 
-        <div className="flex gap-3">
+        <div className="flex gap-4 pt-4">
           <button
             type="submit"
             disabled={isSubmitting || !!error}
-            className={`px-4 py-2 rounded ${isSubmitting || !!error
-                ? 'bg-gray-400 cursor-not-allowed'
-                : 'bg-blue-500 hover:bg-blue-600 text-white'
-              }`}
+            className={`px-4 py-2 ${isSubmitting || !!error
+              ? 'bg-gray-300 cursor-not-allowed'
+              : 'bg-gray-800 hover:bg-black text-white'}`}
           >
             {isSubmitting ? 'Saving...' : 'Save Post'}
           </button>
@@ -175,7 +175,7 @@ export default function BlogPostForm({ postId }: BlogPostFormProps) {
           <button
             type="button"
             onClick={() => router.back()}
-            className="px-4 py-2 border rounded hover:bg-gray-100"
+            className="px-4 py-2 text-gray-600 hover:text-gray-900"
           >
             Cancel
           </button>

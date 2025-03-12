@@ -31,8 +31,6 @@ export default function BlogPostList() {
         $: {
           where: {
             "author.id": profileData.profiles[0].id,
-            // No need for a filter here - permissions will handle visibility
-            // The author can see all their posts (drafts and published)
           },
           limit: PAGE_SIZE,
           offset: (page - 1) * PAGE_SIZE,
@@ -85,8 +83,8 @@ export default function BlogPostList() {
 
   if (posts.length === 0) {
     return (
-      <div className="container mx-auto p-4">
-        <div className="flex justify-between items-center mb-6">
+      <div className="container max-w-3xl mx-auto px-4 py-8">
+        <div className="flex justify-between items-center mb-12">
           <div className="flex items-center space-x-4">
             {profile.avatar ? (
               <img
@@ -104,15 +102,15 @@ export default function BlogPostList() {
             )}
 
             <div>
-              <h1 className="text-3xl font-bold">My Blog</h1>
-              <p className="text-gray-600">Welcome, @{profile.handle}</p>
+              <h1 className="text-3xl font-light">My Blog</h1>
+              <p className="text-gray-500">Welcome, @{profile.handle}</p>
 
               {/* Display social links */}
               {profile.socialLinks && <SocialLinks links={profile.socialLinks} className="mt-2" />}
 
               {/* Edit Profile Link */}
               <div className="mt-2">
-                <Link href="/profile/edit" className="text-sm text-blue-500 hover:underline">
+                <Link href="/profile/edit" className="text-sm text-gray-500 hover:text-gray-800">
                   Edit Profile
                 </Link>
               </div>
@@ -121,7 +119,7 @@ export default function BlogPostList() {
           <div className="flex items-center gap-3">
             <Link
               href="/posts/create"
-              className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded"
+              className="bg-gray-800 hover:bg-black text-white px-4 py-2 rounded-sm transition-colors"
             >
               Create New Post
             </Link>
@@ -130,10 +128,10 @@ export default function BlogPostList() {
         </div>
 
         <div className="p-8 text-center">
-          <p className="mb-4">You don't have any blog posts yet.</p>
+          <p className="mb-6 text-gray-500">You don't have any blog posts yet.</p>
           <Link
             href="/posts/create"
-            className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded"
+            className="bg-gray-800 hover:bg-black text-white px-4 py-2 rounded-sm transition-colors"
           >
             Create Your First Post
           </Link>
@@ -143,8 +141,8 @@ export default function BlogPostList() {
   }
 
   return (
-    <div className="container mx-auto p-4">
-      <div className="flex justify-between items-center mb-6">
+    <div className="container max-w-3xl mx-auto px-4 py-8">
+      <div className="flex justify-between items-center mb-12">
         <div className="flex items-center space-x-4">
           {profile.avatar ? (
             <img
@@ -162,15 +160,15 @@ export default function BlogPostList() {
           )}
 
           <div>
-            <h1 className="text-3xl font-bold">My Blog</h1>
-            <p className="text-gray-600">Welcome, @{profile.handle}</p>
+            <h1 className="text-3xl font-light">My Blog</h1>
+            <p className="text-gray-500">Welcome, @{profile.handle}</p>
 
             {/* Display social links */}
             {profile.socialLinks && <SocialLinks links={profile.socialLinks} className="mt-2" />}
 
             {/* Edit Profile Link */}
             <div className="mt-2">
-              <Link href="/profile/edit" className="text-sm text-blue-500 hover:underline">
+              <Link href="/profile/edit" className="text-sm text-gray-500 hover:text-gray-800">
                 Edit Profile
               </Link>
             </div>
@@ -179,7 +177,7 @@ export default function BlogPostList() {
         <div className="flex items-center gap-3">
           <Link
             href="/posts/create"
-            className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded"
+            className="bg-gray-800 hover:bg-black text-white px-4 py-2 rounded-sm transition-colors"
           >
             Create New Post
           </Link>
@@ -187,44 +185,44 @@ export default function BlogPostList() {
         </div>
       </div>
 
-      <div className="space-y-6">
+      <div className="space-y-10">
         {posts.map((post) => (
-          <div key={post.id} className="border p-4 rounded shadow">
+          <div key={post.id} className="space-y-2 pb-4">
             <div className="flex justify-between">
-              <h2 className="text-xl font-semibold">
-                <Link href={`/posts/${post.id}`} className="hover:underline">
+              <h2 className="text-xl font-normal">
+                <Link href={`/posts/${post.id}`} className="hover:text-gray-500 transition-colors">
                   {post.title}
                 </Link>
               </h2>
               {!post.published && (
-                <span className="bg-yellow-100 text-yellow-800 text-xs font-medium px-2 py-0.5 rounded">
+                <span className="text-gray-400 text-xs">
                   Draft
                 </span>
               )}
             </div>
-            <p className="text-gray-500 text-sm">
+            <p className="text-gray-400 text-sm">
               {new Date(post.createdAt).toLocaleDateString()}
             </p>
-            <p className="mt-2 line-clamp-3">
+            <p className="mt-2 text-gray-600">
               {post.content.substring(0, 150)}
               {post.content.length > 150 ? '...' : ''}
             </p>
-            <div className="mt-3 flex gap-2">
+            <div className="mt-6 flex gap-4">
               <Link
                 href={`/posts/${post.id}`}
-                className="text-blue-500 hover:underline"
+                className="text-gray-500 hover:text-black"
               >
                 Read More
               </Link>
               <Link
                 href={`/posts/edit/${post.id}`}
-                className="text-green-500 hover:underline"
+                className="text-gray-500 hover:text-black"
               >
                 Edit
               </Link>
               <button
                 onClick={() => handleDeletePost(post.id)}
-                className="text-red-500 hover:underline"
+                className="text-gray-500 hover:text-black"
               >
                 Delete
               </button>
@@ -234,19 +232,19 @@ export default function BlogPostList() {
       </div>
 
       {/* Pagination */}
-      <div className="flex justify-between items-center mt-8">
+      <div className="flex justify-between items-center mt-12 text-sm">
         <button
           onClick={() => setPage(p => Math.max(1, p - 1))}
           disabled={page === 1}
-          className={`px-4 py-2 rounded ${page === 1 ? 'bg-gray-300 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600 text-white'}`}
+          className={`px-4 py-2 ${page === 1 ? 'text-gray-300 cursor-not-allowed' : 'text-gray-600 hover:text-black'}`}
         >
           Previous
         </button>
-        <span>Page {page}</span>
+        <span className="text-gray-500">Page {page}</span>
         <button
           onClick={() => setPage(p => p + 1)}
           disabled={posts.length < PAGE_SIZE}
-          className={`px-4 py-2 rounded ${posts.length < PAGE_SIZE ? 'bg-gray-300 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600 text-white'}`}
+          className={`px-4 py-2 ${posts.length < PAGE_SIZE ? 'text-gray-300 cursor-not-allowed' : 'text-gray-600 hover:text-black'}`}
         >
           Next
         </button>

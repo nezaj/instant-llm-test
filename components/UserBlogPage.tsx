@@ -76,8 +76,8 @@ export default function UserBlogPage({ handle }: UserBlogPageProps) {
   if (!profileData?.profiles || profileData.profiles.length === 0) {
     return (
       <div className="text-center p-8">
-        <h1 className="text-2xl font-bold mb-4">User not found</h1>
-        <Link href="/users" className="text-blue-500 hover:underline">
+        <h1 className="text-2xl font-light mb-4">User not found</h1>
+        <Link href="/users" className="text-gray-500 hover:text-gray-800">
           Back to Users
         </Link>
       </div>
@@ -107,14 +107,14 @@ export default function UserBlogPage({ handle }: UserBlogPageProps) {
   }
 
   return (
-    <div className="container mx-auto p-4">
+    <div className="container max-w-3xl mx-auto px-4 py-8">
       <div className="flex justify-between items-center mb-6">
         <div className="flex items-center space-x-3">
-          <Link href="/users" className="text-blue-500 hover:underline">
+          <Link href="/users" className="text-gray-500 hover:text-gray-800">
             ← Back to Users
           </Link>
           {isOwnBlog && (
-            <Link href="/" className="text-blue-500 hover:underline">
+            <Link href="/" className="text-gray-500 hover:text-gray-800">
               Switch to My View
             </Link>
           )}
@@ -122,7 +122,7 @@ export default function UserBlogPage({ handle }: UserBlogPageProps) {
         {user && <SignOutButton />}
       </div>
 
-      <div className="mb-8">
+      <div className="mb-12">
         <div className="flex items-center space-x-4 mb-3">
           {profile.avatar ? (
             <img
@@ -139,8 +139,8 @@ export default function UserBlogPage({ handle }: UserBlogPageProps) {
             </div>
           )}
           <div>
-            <h1 className="text-3xl font-bold">@{profile.handle}'s Blog</h1>
-            <p className="text-gray-600 mt-1">{profile.bio}</p>
+            <h1 className="text-3xl font-light">@{profile.handle}'s Blog</h1>
+            <p className="text-gray-500 mt-1">{profile.bio}</p>
 
             {/* Display social links */}
             {profile.socialLinks && <SocialLinks links={profile.socialLinks} className="mt-2" />}
@@ -152,7 +152,7 @@ export default function UserBlogPage({ handle }: UserBlogPageProps) {
           <div className="mt-4">
             <Link
               href="/profile/edit"
-              className="text-sm bg-gray-100 hover:bg-gray-200 px-4 py-2 rounded border"
+              className="text-sm text-gray-500 hover:text-gray-800"
             >
               Edit Profile
             </Link>
@@ -161,8 +161,8 @@ export default function UserBlogPage({ handle }: UserBlogPageProps) {
       </div>
 
       {posts.length === 0 ? (
-        <div className="text-center p-8 border rounded-lg bg-gray-50">
-          <p className="text-lg text-gray-500">
+        <div className="text-center p-8">
+          <p className="text-gray-500">
             {isOwnBlog
               ? "You don't have any published posts yet."
               : `@${profile.handle} hasn't published any posts yet.`
@@ -171,39 +171,39 @@ export default function UserBlogPage({ handle }: UserBlogPageProps) {
           {isOwnBlog && (
             <Link
               href="/posts/create"
-              className="mt-4 inline-block bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded"
+              className="mt-4 inline-block bg-gray-800 hover:bg-black text-white px-4 py-2 rounded-sm transition-colors"
             >
               Create Your First Post
             </Link>
           )}
         </div>
       ) : (
-        <div className="space-y-6">
+        <div className="space-y-10">
           {posts.map((post) => (
-            <div key={post.id} className="border p-4 rounded shadow">
+            <div key={post.id} className="space-y-2 pb-4">
               <div className="flex justify-between">
-                <h2 className="text-xl font-semibold">
-                  <Link href={`/posts/${post.id}`} className="hover:underline">
+                <h2 className="text-xl font-normal">
+                  <Link href={`/posts/${post.id}`} className="hover:text-gray-500 transition-colors">
                     {post.title}
                   </Link>
                 </h2>
                 {!post.published && isOwnBlog && (
-                  <span className="bg-yellow-100 text-yellow-800 text-xs font-medium px-2 py-0.5 rounded">
+                  <span className="text-gray-400 text-xs">
                     Draft
                   </span>
                 )}
               </div>
-              <p className="text-gray-500 text-sm">
+              <p className="text-gray-400 text-sm">
                 {new Date(post.createdAt).toLocaleDateString()}
               </p>
-              <p className="mt-2 line-clamp-3">
+              <p className="mt-2 text-gray-600">
                 {post.content.substring(0, 150)}
                 {post.content.length > 150 ? '...' : ''}
               </p>
-              <div className="mt-3">
+              <div className="mt-8 flex gap-4">
                 <Link
                   href={`/posts/${post.id}`}
-                  className="text-blue-500 hover:underline"
+                  className="text-gray-500 hover:text-black"
                 >
                   Read More
                 </Link>
@@ -211,13 +211,13 @@ export default function UserBlogPage({ handle }: UserBlogPageProps) {
                   <>
                     <Link
                       href={`/posts/edit/${post.id}`}
-                      className="ml-3 text-green-500 hover:underline"
+                      className="text-gray-500 hover:text-black"
                     >
                       Edit
                     </Link>
                     <button
                       onClick={() => handleDeletePost(post.id)}
-                      className="ml-3 text-red-500 hover:underline"
+                      className="text-gray-500 hover:text-black"
                     >
                       Delete
                     </button>
@@ -231,19 +231,19 @@ export default function UserBlogPage({ handle }: UserBlogPageProps) {
 
       {/* Pagination - only show if there are posts */}
       {posts.length > 0 && (
-        <div className="flex justify-between items-center mt-8">
+        <div className="flex justify-between items-center mt-12 text-sm">
           <button
             onClick={() => setPage(p => Math.max(1, p - 1))}
             disabled={page === 1}
-            className={`px-4 py-2 rounded ${page === 1 ? 'bg-gray-300 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600 text-white'}`}
+            className={`px-4 py-2 ${page === 1 ? 'text-gray-300 cursor-not-allowed' : 'text-gray-600 hover:text-black'}`}
           >
             Previous
           </button>
-          <span>Page {page}</span>
+          <span className="text-gray-500">Page {page}</span>
           <button
             onClick={() => setPage(p => p + 1)}
             disabled={posts.length < PAGE_SIZE}
-            className={`px-4 py-2 rounded ${posts.length < PAGE_SIZE ? 'bg-gray-300 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600 text-white'}`}
+            className={`px-4 py-2 ${posts.length < PAGE_SIZE ? 'text-gray-300 cursor-not-allowed' : 'text-gray-600 hover:text-black'}`}
           >
             Next
           </button>

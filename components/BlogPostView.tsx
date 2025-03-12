@@ -1,3 +1,4 @@
+// components/BlogPostView.tsx
 "use client";
 
 import { db } from '@/lib/db';
@@ -61,9 +62,9 @@ export default function BlogPostView({ postId }: BlogPostViewProps) {
     // Could be a permission error (trying to view someone else's draft)
     return (
       <div className="text-center p-8">
-        <h1 className="text-2xl font-bold mb-4">Post not available</h1>
-        <p className="mb-4">This post may be a draft or has been removed.</p>
-        <Link href="/" className="text-blue-500 hover:underline">
+        <h1 className="text-2xl font-light mb-4">Post not available</h1>
+        <p className="mb-4 text-gray-500">This post may be a draft or has been removed.</p>
+        <Link href="/" className="text-gray-600 hover:text-gray-900">
           Return to Home
         </Link>
       </div>
@@ -74,8 +75,8 @@ export default function BlogPostView({ postId }: BlogPostViewProps) {
   if (!data.posts || data.posts.length === 0) {
     return (
       <div className="text-center p-8">
-        <h1 className="text-2xl font-bold mb-4">Post not found</h1>
-        <Link href="/" className="text-blue-500 hover:underline">
+        <h1 className="text-2xl font-light mb-4">Post not found</h1>
+        <Link href="/" className="text-gray-600 hover:text-gray-900">
           Return to Home
         </Link>
       </div>
@@ -116,52 +117,52 @@ export default function BlogPostView({ postId }: BlogPostViewProps) {
   };
 
   return (
-    <div className="container mx-auto p-4 max-w-3xl">
-      <div className="flex justify-between items-center mb-6">
+    <div className="container max-w-2xl mx-auto px-4 py-8">
+      <div className="flex justify-between items-center mb-10">
         {isOwner ? (
-          <Link href="/" className="text-blue-500 hover:underline">
+          <Link href="/" className="text-gray-500 hover:text-gray-800">
             ← Back to My Posts
           </Link>
         ) : (
-          <Link href={`/user/${authorProfile?.handle}`} className="text-blue-500 hover:underline">
+          <Link href={`/user/${authorProfile?.handle}`} className="text-gray-500 hover:text-gray-800">
             ← Back to @{authorProfile?.handle}'s Posts
           </Link>
         )}
         {user && <SignOutButton />}
       </div>
 
-      <article>
-        <header className="mb-6">
+      <article className="prose max-w-none">
+        <header className="mb-8">
           <div className="flex items-center justify-between">
-            <h1 className="text-3xl font-bold">{post.title}</h1>
+            <h1 className="text-3xl font-light mb-0">{post.title}</h1>
             {!post.published && (
-              <span className="bg-yellow-100 text-yellow-800 text-xs font-medium px-2 py-0.5 rounded">
+              <span className="text-gray-400 text-xs">
                 Draft
               </span>
             )}
           </div>
-          <p className="text-gray-500 mt-2">
+          <p className="text-gray-400 mt-2">
             Published by {authorProfile?.handle || 'Unknown'} on {new Date(post.createdAt).toLocaleDateString()}
             {post.updatedAt !== post.createdAt &&
               ` · Updated on ${new Date(post.updatedAt).toLocaleDateString()}`}
           </p>
         </header>
 
-        <div className="prose max-w-none mb-8 whitespace-pre-wrap">
+        <div className="text-gray-800 whitespace-pre-wrap leading-relaxed">
           {post.content}
         </div>
 
         {isOwner && (
-          <div className="flex gap-3 mb-8">
+          <div className="flex gap-3 mt-12 pt-6 border-t border-gray-100">
             <Link
               href={`/posts/edit/${postId}`}
-              className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded"
+              className="text-gray-500 hover:text-gray-900"
             >
               Edit Post
             </Link>
             <button
               onClick={handleDeletePost}
-              className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded"
+              className="text-gray-500 hover:text-gray-900"
             >
               Delete Post
             </button>
@@ -171,18 +172,18 @@ export default function BlogPostView({ postId }: BlogPostViewProps) {
 
       {/* Post Navigation - show navigation for all author's posts that the current user can see */}
       {authorPosts.length > 1 && (
-        <div className="border-t pt-4 mt-8">
-          <div className="flex justify-between">
+        <div className="border-t border-gray-100 pt-6 mt-12">
+          <div className="flex justify-between text-sm">
             <div>
               {nextPost && (
-                <Link href={`/posts/${nextPost.id}`} className="text-blue-500 hover:underline">
+                <Link href={`/posts/${nextPost.id}`} className="text-gray-500 hover:text-gray-800">
                   ← {nextPost.title}
                 </Link>
               )}
             </div>
             <div>
               {prevPost && (
-                <Link href={`/posts/${prevPost.id}`} className="text-blue-500 hover:underline">
+                <Link href={`/posts/${prevPost.id}`} className="text-gray-500 hover:text-gray-800">
                   {prevPost.title} →
                 </Link>
               )}

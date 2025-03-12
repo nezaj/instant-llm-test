@@ -185,24 +185,24 @@ export default function EditProfileForm() {
   };
 
   return (
-    <div className="container mx-auto p-4 max-w-md">
-      <h1 className="text-2xl font-bold mb-6">Edit Your Profile</h1>
+    <div className="container max-w-2xl mx-auto px-4 py-8">
+      <h1 className="text-3xl font-light mb-8">Edit Your Profile</h1>
 
       {error && (
-        <div className="bg-red-50 text-red-500 p-3 rounded mb-6">
+        <div className="text-red-500 mb-6">
           {error}
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-6">
         {/* Avatar Section */}
-        <div className="flex flex-col items-center mb-6">
+        <div className="flex flex-col items-center mb-8">
           <div className="mb-4">
             {avatarPreview ? (
               <img
                 src={avatarPreview}
                 alt="Avatar Preview"
-                className="w-24 h-24 rounded-full object-cover border-2 border-gray-300"
+                className="w-24 h-24 rounded-full object-cover"
               />
             ) : (
               <div
@@ -215,7 +215,7 @@ export default function EditProfileForm() {
           </div>
 
           <div className="flex flex-col items-center space-y-2">
-            <label className="cursor-pointer bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">
+            <label className="cursor-pointer bg-gray-800 hover:bg-black text-white px-4 py-2 rounded-sm transition-colors">
               {hasAvatar ? 'Change Avatar' : 'Upload Avatar'}
               <input
                 type="file"
@@ -230,7 +230,7 @@ export default function EditProfileForm() {
               <button
                 type="button"
                 onClick={handleRemoveAvatar}
-                className="text-red-500 hover:text-red-700"
+                className="text-gray-500 hover:text-gray-800"
               >
                 Remove Avatar
               </button>
@@ -239,7 +239,7 @@ export default function EditProfileForm() {
         </div>
 
         <div>
-          <label htmlFor="handle" className="block mb-1 font-medium">
+          <label htmlFor="handle" className="block mb-2 text-gray-700 font-light">
             Handle
           </label>
           <input
@@ -247,32 +247,32 @@ export default function EditProfileForm() {
             type="text"
             value={handle}
             onChange={(e) => setHandle(e.target.value)}
-            className="w-full border border-gray-300 rounded px-3 py-2"
+            className="w-full px-3 py-2 border border-gray-200 rounded-sm focus:outline-none focus:border-gray-400"
             placeholder="your_handle"
             required
           />
         </div>
 
         <div>
-          <label htmlFor="bio" className="block mb-1 font-medium">
+          <label htmlFor="bio" className="block mb-2 text-gray-700 font-light">
             Bio
           </label>
           <textarea
             id="bio"
             value={bio}
             onChange={(e) => setBio(e.target.value)}
-            className="w-full border border-gray-300 rounded px-3 py-2 min-h-[100px]"
+            className="w-full px-3 py-2 border border-gray-200 rounded-sm focus:outline-none focus:border-gray-400 min-h-[100px]"
             placeholder="Tell us a bit about yourself..."
             required
           />
         </div>
 
-        <div className="border-t pt-4 mt-4">
-          <h2 className="text-lg font-semibold mb-3">Social Links</h2>
+        <div className="pt-6 border-t border-gray-100">
+          <h2 className="text-xl font-light mb-4">Social Links</h2>
 
           {/* Twitter */}
-          <div className="mb-3">
-            <label htmlFor="twitter" className="block mb-1 font-medium">
+          <div className="mb-4">
+            <label htmlFor="twitter" className="block mb-2 text-gray-700 font-light">
               Twitter
             </label>
             <div className="flex">
@@ -281,14 +281,14 @@ export default function EditProfileForm() {
                 type="text"
                 value={socialLinks.twitter || ""}
                 onChange={(e) => handleSocialLinkChange("twitter", e.target.value)}
-                className="w-full border border-gray-300 rounded-l px-3 py-2"
+                className="w-full px-3 py-2 border border-gray-200 rounded-sm focus:outline-none focus:border-gray-400"
                 placeholder="Your Twitter username"
               />
               {socialLinks.twitter && (
                 <button
                   type="button"
                   onClick={() => handleRemoveSocialLink("twitter")}
-                  className="bg-red-500 text-white px-3 rounded-r"
+                  className="ml-2 text-gray-500 hover:text-gray-800"
                 >
                   ✕
                 </button>
@@ -297,8 +297,8 @@ export default function EditProfileForm() {
           </div>
 
           {/* GitHub */}
-          <div className="mb-3">
-            <label htmlFor="github" className="block mb-1 font-medium">
+          <div className="mb-4">
+            <label htmlFor="github" className="block mb-2 text-gray-700 font-light">
               GitHub
             </label>
             <div className="flex">
@@ -307,14 +307,14 @@ export default function EditProfileForm() {
                 type="text"
                 value={socialLinks.github || ""}
                 onChange={(e) => handleSocialLinkChange("github", e.target.value)}
-                className="w-full border border-gray-300 rounded-l px-3 py-2"
+                className="w-full px-3 py-2 border border-gray-200 rounded-sm focus:outline-none focus:border-gray-400"
                 placeholder="Your GitHub username"
               />
               {socialLinks.github && (
                 <button
                   type="button"
                   onClick={() => handleRemoveSocialLink("github")}
-                  className="bg-red-500 text-white px-3 rounded-r"
+                  className="ml-2 text-gray-500 hover:text-gray-800"
                 >
                   ✕
                 </button>
@@ -323,8 +323,8 @@ export default function EditProfileForm() {
           </div>
 
           {/* LinkedIn */}
-          <div className="mb-3">
-            <label htmlFor="linkedin" className="block mb-1 font-medium">
+          <div className="mb-4">
+            <label htmlFor="linkedin" className="block mb-2 text-gray-700 font-light">
               LinkedIn
             </label>
             <div className="flex">
@@ -333,14 +333,14 @@ export default function EditProfileForm() {
                 type="text"
                 value={socialLinks.linkedin || ""}
                 onChange={(e) => handleSocialLinkChange("linkedin", e.target.value)}
-                className="w-full border border-gray-300 rounded-l px-3 py-2"
+                className="w-full px-3 py-2 border border-gray-200 rounded-sm focus:outline-none focus:border-gray-400"
                 placeholder="Your LinkedIn username"
               />
               {socialLinks.linkedin && (
                 <button
                   type="button"
                   onClick={() => handleRemoveSocialLink("linkedin")}
-                  className="bg-red-500 text-white px-3 rounded-r"
+                  className="ml-2 text-gray-500 hover:text-gray-800"
                 >
                   ✕
                 </button>
@@ -349,8 +349,8 @@ export default function EditProfileForm() {
           </div>
 
           {/* Instagram */}
-          <div className="mb-3">
-            <label htmlFor="instagram" className="block mb-1 font-medium">
+          <div className="mb-4">
+            <label htmlFor="instagram" className="block mb-2 text-gray-700 font-light">
               Instagram
             </label>
             <div className="flex">
@@ -359,14 +359,14 @@ export default function EditProfileForm() {
                 type="text"
                 value={socialLinks.instagram || ""}
                 onChange={(e) => handleSocialLinkChange("instagram", e.target.value)}
-                className="w-full border border-gray-300 rounded-l px-3 py-2"
+                className="w-full px-3 py-2 border border-gray-200 rounded-sm focus:outline-none focus:border-gray-400"
                 placeholder="Your Instagram username"
               />
               {socialLinks.instagram && (
                 <button
                   type="button"
                   onClick={() => handleRemoveSocialLink("instagram")}
-                  className="bg-red-500 text-white px-3 rounded-r"
+                  className="ml-2 text-gray-500 hover:text-gray-800"
                 >
                   ✕
                 </button>
@@ -375,8 +375,8 @@ export default function EditProfileForm() {
           </div>
 
           {/* Website */}
-          <div className="mb-3">
-            <label htmlFor="website" className="block mb-1 font-medium">
+          <div className="mb-4">
+            <label htmlFor="website" className="block mb-2 text-gray-700 font-light">
               Website
             </label>
             <div className="flex">
@@ -385,14 +385,14 @@ export default function EditProfileForm() {
                 type="text"
                 value={socialLinks.website || ""}
                 onChange={(e) => handleSocialLinkChange("website", e.target.value)}
-                className="w-full border border-gray-300 rounded-l px-3 py-2"
+                className="w-full px-3 py-2 border border-gray-200 rounded-sm focus:outline-none focus:border-gray-400"
                 placeholder="Your website URL"
               />
               {socialLinks.website && (
                 <button
                   type="button"
                   onClick={() => handleRemoveSocialLink("website")}
-                  className="bg-red-500 text-white px-3 rounded-r"
+                  className="ml-2 text-gray-500 hover:text-gray-800"
                 >
                   ✕
                 </button>
@@ -401,14 +401,13 @@ export default function EditProfileForm() {
           </div>
         </div>
 
-        <div className="flex gap-3">
+        <div className="flex gap-4 pt-6">
           <button
             type="submit"
             disabled={isSubmitting}
-            className={`px-4 py-2 rounded font-medium ${isSubmitting
-              ? "bg-gray-400 cursor-not-allowed"
-              : "bg-blue-500 hover:bg-blue-600 text-white"
-              }`}
+            className={`px-4 py-2 ${isSubmitting
+              ? "bg-gray-300 cursor-not-allowed"
+              : "bg-gray-800 hover:bg-black text-white transition-colors"}`}
           >
             {isSubmitting ? "Saving..." : "Save Profile"}
           </button>
@@ -416,7 +415,7 @@ export default function EditProfileForm() {
           <button
             type="button"
             onClick={() => router.push("/")}
-            className="px-4 py-2 border rounded hover:bg-gray-100"
+            className="px-4 py-2 text-gray-600 hover:text-gray-900"
           >
             Cancel
           </button>

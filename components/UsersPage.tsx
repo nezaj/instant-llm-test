@@ -53,28 +53,28 @@ export default function UsersPage() {
   const profiles = data?.profiles || [];
 
   return (
-    <div className="container mx-auto p-4">
-      <div className="flex justify-between items-center mb-6">
+    <div className="container max-w-5xl mx-auto px-4 py-8">
+      <div className="flex justify-between items-center mb-12">
         <div>
-          <h1 className="text-3xl font-bold">Discover Blogs</h1>
-          <p className="text-gray-600">Find and follow other bloggers</p>
+          <h1 className="text-3xl font-light">Discover Blogs</h1>
+          <p className="text-gray-500">Find and follow other bloggers</p>
         </div>
         <div className="flex items-center gap-3">
-          <Link href="/" className="text-blue-500 hover:underline">
+          <Link href="/" className="text-gray-500 hover:text-gray-800">
             My Blog
           </Link>
           {user && <SignOutButton />}
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {profiles.map((profile) => {
           const isCurrentUser = currentUserProfile?.id === profile.id;
 
           return (
             <div
               key={profile.id}
-              className={`border p-4 rounded shadow hover:shadow-md transition-shadow`}
+              className="group"
             >
               <div className="flex items-center space-x-3 mb-3">
                 {profile.avatar ? (
@@ -95,19 +95,19 @@ export default function UsersPage() {
                 )}
                 <div>
                   <div className="flex items-center">
-                    <h2 className="text-xl font-semibold">@{profile.handle}</h2>
+                    <h2 className="text-lg font-normal">@{profile.handle}</h2>
                     {isCurrentUser && (
-                      <span className="ml-2 bg-blue-100 text-blue-800 text-xs font-medium px-2 py-0.5 rounded">
+                      <span className="ml-2 text-gray-400 text-xs">
                         You
                       </span>
                     )}
                   </div>
-                  <p className="text-gray-500 text-sm">
+                  <p className="text-gray-400 text-xs">
                     Joined {new Date(profile.createdAt).toLocaleDateString()}
                   </p>
                 </div>
               </div>
-              <p className="mb-4 line-clamp-3 text-gray-700">
+              <p className="mb-4 text-gray-600 line-clamp-3">
                 {profile.bio}
               </p>
 
@@ -121,16 +121,16 @@ export default function UsersPage() {
               {isCurrentUser ? (
                 <Link
                   href="/"
-                  className="block w-full text-center bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded"
+                  className="text-gray-500 hover:text-black"
                 >
-                  Go to My Blog
+                  Go to My Blog →
                 </Link>
               ) : (
                 <Link
                   href={`/user/${profile.handle}`}
-                  className="block w-full text-center bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded"
+                  className="text-gray-500 hover:text-black"
                 >
-                  View Blog
+                  View Blog →
                 </Link>
               )}
             </div>
@@ -145,23 +145,25 @@ export default function UsersPage() {
       )}
 
       {/* Pagination */}
-      <div className="flex justify-between items-center mt-8">
-        <button
-          onClick={() => setPage(p => Math.max(1, p - 1))}
-          disabled={page === 1}
-          className={`px-4 py-2 rounded ${page === 1 ? 'bg-gray-300 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600 text-white'}`}
-        >
-          Previous
-        </button>
-        <span>Page {page}</span>
-        <button
-          onClick={() => setPage(p => p + 1)}
-          disabled={profiles.length < PAGE_SIZE}
-          className={`px-4 py-2 rounded ${profiles.length < PAGE_SIZE ? 'bg-gray-300 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600 text-white'}`}
-        >
-          Next
-        </button>
-      </div>
+      {profiles.length > 0 && (
+        <div className="flex justify-between items-center mt-12 text-sm">
+          <button
+            onClick={() => setPage(p => Math.max(1, p - 1))}
+            disabled={page === 1}
+            className={`px-4 py-2 ${page === 1 ? 'text-gray-300 cursor-not-allowed' : 'text-gray-600 hover:text-black'}`}
+          >
+            Previous
+          </button>
+          <span className="text-gray-500">Page {page}</span>
+          <button
+            onClick={() => setPage(p => p + 1)}
+            disabled={profiles.length < PAGE_SIZE}
+            className={`px-4 py-2 ${profiles.length < PAGE_SIZE ? 'text-gray-300 cursor-not-allowed' : 'text-gray-600 hover:text-black'}`}
+          >
+            Next
+          </button>
+        </div>
+      )}
     </div>
   );
 }

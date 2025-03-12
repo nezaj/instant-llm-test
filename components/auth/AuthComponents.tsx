@@ -115,8 +115,8 @@ function EmailStep({ onSendEmail }: { onSendEmail: (email: string) => void }) {
         type="submit"
         disabled={isLoading}
         className={`px-4 py-2 rounded font-medium ${isLoading
-            ? "bg-gray-400 cursor-not-allowed"
-            : "bg-blue-500 hover:bg-blue-600 text-white"
+          ? "bg-gray-400 cursor-not-allowed"
+          : "bg-blue-500 hover:bg-blue-600 text-white"
           }`}
       >
         {isLoading ? "Sending..." : "Send Code"}
@@ -202,8 +202,8 @@ function CodeStep({ sentEmail }: { sentEmail: string }) {
         type="submit"
         disabled={isLoading}
         className={`px-4 py-2 rounded font-medium ${isLoading
-            ? "bg-gray-400 cursor-not-allowed"
-            : "bg-blue-500 hover:bg-blue-600 text-white"
+          ? "bg-gray-400 cursor-not-allowed"
+          : "bg-blue-500 hover:bg-blue-600 text-white"
           }`}
       >
         {isLoading ? "Verifying..." : "Verify Code"}
@@ -223,7 +223,7 @@ export function SignOutButton() {
   return (
     <button
       onClick={handleSignOut}
-      className="text-sm px-3 py-1 border rounded hover:bg-gray-100"
+      className="text-sm text-gray-500 hover:text-gray-800"
     >
       Sign Out
     </button>
