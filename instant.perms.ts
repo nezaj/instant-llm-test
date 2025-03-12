@@ -1,3 +1,4 @@
+// instant.perms.ts
 // Docs: https://www.instantdb.com/docs/permissions
 
 import type { InstantRules } from "@instantdb/react";
@@ -29,6 +30,17 @@ const rules = {
       delete: "auth.id in data.ref('$user.id')"
     }
   },
+  // Define permissions for files
+  $files: {
+    allow: {
+      // Everyone can view files (needed for avatars to be public)
+      view: "true",
+      // Only authenticated users can create files
+      create: "auth.id != null",
+      // Only the owner of the profile can delete the avatar file
+      delete: "auth.id in data.ref('profile.$user.id')"
+    }
+  }
 } satisfies InstantRules;
 
 export default rules;

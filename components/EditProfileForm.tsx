@@ -1,15 +1,18 @@
 // components/EditProfileForm.tsx
 "use client";
 
-import { useState, FormEvent, useEffect } from "react";
+import { useState, FormEvent, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { db, updateProfile, SocialLinks } from "@/lib/db";
+import { db, updateProfile, uploadAvatar, deleteAvatar, SocialLinks, stringToColor } from "@/lib/db";
 
 export default function EditProfileForm() {
   const { isLoading: authLoading, user, error: authError } = db.useAuth();
   const [handle, setHandle] = useState("");
   const [bio, setBio] = useState("");
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isDeleteAvatar, setIsDeleteAvatar] = useState(false);
   const [error, setError] = useState("");
   const [socialLinks, setSocialLinks] = useState<SocialLinks>({
     twitter: "",
@@ -18,11 +21,12 @@ export default function EditProfileForm() {
     instagram: "",
     website: "",
   });
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
 
   // Get user profile
   const { data, isLoading: profileLoading } = db.useQuery(
-    user ? { profiles: { $: { where: { "$user.id": user?.id } } } } : null
+    user ? { profiles: { $: { where: { "$user.id": user?.id } }, avatar: {} } } : null
   );
 
   // Load profile data when it's available
@@ -31,6 +35,11 @@ export default function EditProfileForm() {
       const profile = data.profiles[0];
       setHandle(profile.handle);
       setBio(profile.bio || "");
+
+      // Load avatar preview if available
+      if (profile.avatar?.url) {
+        setAvatarPreview(profile.avatar.url);
+      }
 
       // Load existing social links if available
       if (profile.socialLinks) {
@@ -71,6 +80,47 @@ export default function EditProfileForm() {
     return <div className="flex justify-center p-8">No profile found. Redirecting to profile creation...</div>;
   }
 
+  const profile = data.profiles[0];
+  const hasAvatar = !!profile.avatar;
+
+  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        setError('Please select an image file.');
+        return;
+      }
+
+      // Validate file size (max 2MB)
+      if (file.size > 2 * 1024 * 1024) {
+        setError('Avatar image must be less than 2MB.');
+        return;
+      }
+
+      setAvatarFile(file);
+      setIsDeleteAvatar(false);
+
+      // Create preview URL
+      const previewUrl = URL.createObjectURL(file);
+      setAvatarPreview(previewUrl);
+    }
+  };
+
+  const handleRemoveAvatar = () => {
+    setAvatarFile(null);
+    if (avatarPreview && !profile.avatar?.url) {
+      URL.revokeObjectURL(avatarPreview);
+    }
+    setAvatarPreview(null);
+    setIsDeleteAvatar(true);
+
+    // Clear the file input
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
   const handleSocialLinkChange = (platform: string, value: string) => {
     setSocialLinks(prev => ({
       ...prev,
@@ -106,11 +156,18 @@ export default function EditProfileForm() {
       });
 
       // Update profile
-      await updateProfile(data.profiles[0].id, {
+      await updateProfile(profile.id, {
         handle,
         bio,
         socialLinks: cleanedSocialLinks
       });
+
+      // Handle avatar
+      if (isDeleteAvatar) {
+        await deleteAvatar(profile.id);
+      } else if (avatarFile) {
+        await uploadAvatar(profile.id, avatarFile);
+      }
 
       router.push("/");
     } catch (err: any) {
@@ -138,6 +195,49 @@ export default function EditProfileForm() {
       )}
 
       <form onSubmit={handleSubmit} className="space-y-4">
+        {/* Avatar Section */}
+        <div className="flex flex-col items-center mb-6">
+          <div className="mb-4">
+            {avatarPreview ? (
+              <img
+                src={avatarPreview}
+                alt="Avatar Preview"
+                className="w-24 h-24 rounded-full object-cover border-2 border-gray-300"
+              />
+            ) : (
+              <div
+                className="w-24 h-24 rounded-full flex items-center justify-center text-white text-2xl font-bold"
+                style={{ backgroundColor: stringToColor(handle) }}
+              >
+                {handle.charAt(0).toUpperCase()}
+              </div>
+            )}
+          </div>
+
+          <div className="flex flex-col items-center space-y-2">
+            <label className="cursor-pointer bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">
+              {hasAvatar ? 'Change Avatar' : 'Upload Avatar'}
+              <input
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={handleAvatarChange}
+                ref={fileInputRef}
+              />
+            </label>
+
+            {(avatarPreview || hasAvatar) && (
+              <button
+                type="button"
+                onClick={handleRemoveAvatar}
+                className="text-red-500 hover:text-red-700"
+              >
+                Remove Avatar
+              </button>
+            )}
+          </div>
+        </div>
+
         <div>
           <label htmlFor="handle" className="block mb-1 font-medium">
             Handle

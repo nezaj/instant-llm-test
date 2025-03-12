@@ -1,6 +1,6 @@
 // components/UsersPage.tsx
 "use client";
-import { db } from '@/lib/db';
+import { db, stringToColor } from '@/lib/db';
 import Link from 'next/link';
 import { useState } from 'react';
 import { SignOutButton } from '@/components/auth/AuthComponents';
@@ -24,7 +24,7 @@ export default function UsersPage() {
 
   const currentUserProfile = currentUserProfileData?.profiles?.[0];
 
-  // Query all profiles with pagination
+  // Query all profiles with pagination and include avatars
   const { isLoading, error, data } = db.useQuery({
     profiles: {
       $: {
@@ -33,7 +33,8 @@ export default function UsersPage() {
         order: {
           createdAt: 'desc'
         }
-      }
+      },
+      avatar: {}
     }
   });
 
@@ -76,14 +77,22 @@ export default function UsersPage() {
               className={`border p-4 rounded shadow hover:shadow-md transition-shadow`}
             >
               <div className="flex items-center space-x-3 mb-3">
-                <div
-                  className={`w-12 h-12 rounded-full flex items-center justify-center text-white text-xl font-bold`}
-                  style={{
-                    backgroundColor: stringToColor(profile.handle),
-                  }}
-                >
-                  {profile.handle.charAt(0).toUpperCase()}
-                </div>
+                {profile.avatar ? (
+                  <img
+                    src={profile.avatar.url}
+                    alt={`${profile.handle}'s avatar`}
+                    className="w-12 h-12 rounded-full object-cover"
+                  />
+                ) : (
+                  <div
+                    className="w-12 h-12 rounded-full flex items-center justify-center text-white text-xl font-bold"
+                    style={{
+                      backgroundColor: stringToColor(profile.handle),
+                    }}
+                  >
+                    {profile.handle.charAt(0).toUpperCase()}
+                  </div>
+                )}
                 <div>
                   <div className="flex items-center">
                     <h2 className="text-xl font-semibold">@{profile.handle}</h2>
@@ -155,15 +164,4 @@ export default function UsersPage() {
       </div>
     </div>
   );
-}
-
-// Helper function to generate a consistent color from a string
-function stringToColor(str: string) {
-  let hash = 0;
-  for (let i = 0; i < str.length; i++) {
-    hash = str.charCodeAt(i) + ((hash << 5) - hash);
-  }
-
-  const hue = hash % 360;
-  return `hsl(${hue}, 65%, 55%)`;
 }

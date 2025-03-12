@@ -1,7 +1,7 @@
 // components/BlogPostList.tsx
 "use client";
 
-import { db } from '@/lib/db';
+import { db, stringToColor } from '@/lib/db';
 import { useState } from 'react';
 import Link from 'next/link';
 import { SignOutButton } from './auth/AuthComponents';
@@ -18,7 +18,8 @@ export default function BlogPostList() {
       profiles: {
         $: {
           where: { "$user.id": user.id }
-        }
+        },
+        avatar: {}
       }
     } : null
   );
@@ -71,22 +72,50 @@ export default function BlogPostList() {
   const profile = profileData.profiles[0];
   const posts = postsData?.posts || [];
 
+  const handleDeletePost = async (postId: string) => {
+    if (confirm('Are you sure you want to delete this post?')) {
+      try {
+        await db.transact(db.tx.posts[postId].delete());
+      } catch (err) {
+        console.error('Error deleting post:', err);
+        alert('Failed to delete post. Please try again.');
+      }
+    }
+  };
+
   if (posts.length === 0) {
     return (
       <div className="container mx-auto p-4">
         <div className="flex justify-between items-center mb-6">
-          <div>
-            <h1 className="text-3xl font-bold">My Blog</h1>
-            <p className="text-gray-600">Welcome, @{profile.handle}</p>
+          <div className="flex items-center space-x-4">
+            {profile.avatar ? (
+              <img
+                src={profile.avatar.url}
+                alt={`${profile.handle}'s avatar`}
+                className="w-16 h-16 rounded-full object-cover"
+              />
+            ) : (
+              <div
+                className="w-16 h-16 rounded-full flex items-center justify-center text-white text-2xl font-bold"
+                style={{ backgroundColor: stringToColor(profile.handle) }}
+              >
+                {profile.handle.charAt(0).toUpperCase()}
+              </div>
+            )}
 
-            {/* Display social links */}
-            {profile.socialLinks && <SocialLinks links={profile.socialLinks} className="mt-2" />}
+            <div>
+              <h1 className="text-3xl font-bold">My Blog</h1>
+              <p className="text-gray-600">Welcome, @{profile.handle}</p>
 
-            {/* Edit Profile Link */}
-            <div className="mt-2">
-              <Link href="/profile/edit" className="text-sm text-blue-500 hover:underline">
-                Edit Profile
-              </Link>
+              {/* Display social links */}
+              {profile.socialLinks && <SocialLinks links={profile.socialLinks} className="mt-2" />}
+
+              {/* Edit Profile Link */}
+              <div className="mt-2">
+                <Link href="/profile/edit" className="text-sm text-blue-500 hover:underline">
+                  Edit Profile
+                </Link>
+              </div>
             </div>
           </div>
           <div className="flex items-center gap-3">
@@ -116,18 +145,35 @@ export default function BlogPostList() {
   return (
     <div className="container mx-auto p-4">
       <div className="flex justify-between items-center mb-6">
-        <div>
-          <h1 className="text-3xl font-bold">My Blog</h1>
-          <p className="text-gray-600">Welcome, @{profile.handle}</p>
+        <div className="flex items-center space-x-4">
+          {profile.avatar ? (
+            <img
+              src={profile.avatar.url}
+              alt={`${profile.handle}'s avatar`}
+              className="w-16 h-16 rounded-full object-cover"
+            />
+          ) : (
+            <div
+              className="w-16 h-16 rounded-full flex items-center justify-center text-white text-2xl font-bold"
+              style={{ backgroundColor: stringToColor(profile.handle) }}
+            >
+              {profile.handle.charAt(0).toUpperCase()}
+            </div>
+          )}
 
-          {/* Display social links */}
-          {profile.socialLinks && <SocialLinks links={profile.socialLinks} className="mt-2" />}
+          <div>
+            <h1 className="text-3xl font-bold">My Blog</h1>
+            <p className="text-gray-600">Welcome, @{profile.handle}</p>
 
-          {/* Edit Profile Link */}
-          <div className="mt-2">
-            <Link href="/profile/edit" className="text-sm text-blue-500 hover:underline">
-              Edit Profile
-            </Link>
+            {/* Display social links */}
+            {profile.socialLinks && <SocialLinks links={profile.socialLinks} className="mt-2" />}
+
+            {/* Edit Profile Link */}
+            <div className="mt-2">
+              <Link href="/profile/edit" className="text-sm text-blue-500 hover:underline">
+                Edit Profile
+              </Link>
+            </div>
           </div>
         </div>
         <div className="flex items-center gap-3">
@@ -207,15 +253,4 @@ export default function BlogPostList() {
       </div>
     </div>
   );
-
-  async function handleDeletePost(postId: string) {
-    if (confirm('Are you sure you want to delete this post?')) {
-      try {
-        await db.transact(db.tx.posts[postId].delete());
-      } catch (err) {
-        console.error('Error deleting post:', err);
-        alert('Failed to delete post. Please try again.');
-      }
-    }
-  }
 }

@@ -54,6 +54,83 @@ export function updateProfile(profileId: string, data: { handle?: string; bio?: 
   return db.transact(db.tx.profiles[profileId].update(data));
 }
 
+// Avatar functions
+export async function uploadAvatar(profileId: string, file: File) {
+  try {
+    // Get existing avatar to delete it if it exists
+    const { data: profileData } = await db.queryOnce({
+      profiles: {
+        $: { where: { id: profileId } },
+        avatar: {}
+      }
+    });
+
+    const profile = profileData.profiles[0];
+    const existingAvatar = profile?.avatar;
+
+    // Generate a unique path for the avatar
+    const extension = file.name.split('.').pop()?.toLowerCase() || 'jpg';
+    const path = `avatars/${profileId}/${Date.now()}.${extension}`;
+
+    // Upload the new file
+    const { data: fileData } = await db.storage.uploadFile(path, file, {
+      contentType: file.type || 'image/jpeg'
+    });
+
+    // Delete the old avatar file if it exists
+    if (existingAvatar) {
+      try {
+        // Unlink the old avatar from the profile
+        await db.transact(db.tx.profiles[profileId].unlink({ avatar: existingAvatar.id }));
+        // Delete the old file
+        await db.storage.delete(existingAvatar.path);
+      } catch (err) {
+        console.error('Error deleting old avatar:', err);
+        // Continue even if deleting the old avatar fails
+      }
+    }
+
+    // Link the new avatar to the profile
+    await db.transact(db.tx.profiles[profileId].link({ avatar: fileData.id }));
+
+    return fileData;
+  } catch (error) {
+    console.error('Error uploading avatar:', error);
+    throw error;
+  }
+}
+
+export async function deleteAvatar(profileId: string) {
+  try {
+    // Get the avatar
+    const { data } = await db.queryOnce({
+      profiles: {
+        $: { where: { id: profileId } },
+        avatar: {}
+      }
+    });
+
+    const profile = data.profiles[0];
+    const avatar = profile?.avatar;
+
+    if (!avatar) {
+      // No avatar to delete
+      return null;
+    }
+
+    // Unlink the avatar from the profile
+    await db.transact(db.tx.profiles[profileId].unlink({ avatar: avatar.id }));
+
+    // Delete the file
+    await db.storage.delete(avatar.path);
+
+    return true;
+  } catch (error) {
+    console.error('Error deleting avatar:', error);
+    throw error;
+  }
+}
+
 // Function to create example posts for new users
 export async function createExamplePosts(profileId: string) {
   const post1Id = id();
@@ -93,6 +170,17 @@ export async function createExamplePosts(profileId: string) {
   ]);
 }
 
+// Helper function to generate a consistent color from a string
+export function stringToColor(str: string) {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    hash = str.charCodeAt(i) + ((hash << 5) - hash);
+  }
+
+  const hue = hash % 360;
+  return `hsl(${hue}, 65%, 55%)`;
+}
+
 // Define the structure of social links
 export interface SocialLinks {
   twitter?: string;
@@ -122,6 +210,11 @@ export type Profile = {
   bio: string;
   createdAt: number;
   socialLinks?: SocialLinks;
+  avatar?: {
+    id: string;
+    path: string;
+    url: string;
+  };
   $user?: {
     id: string;
     email: string;

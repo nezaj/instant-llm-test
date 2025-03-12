@@ -1,6 +1,6 @@
 // components/UserBlogPage.tsx
 "use client";
-import { db } from '@/lib/db';
+import { db, stringToColor } from '@/lib/db';
 import Link from 'next/link';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -22,7 +22,8 @@ export default function UserBlogPage({ handle }: UserBlogPageProps) {
     profiles: {
       $: {
         where: { handle: handle }
-      }
+      },
+      avatar: {}
     }
   });
 
@@ -90,6 +91,21 @@ export default function UserBlogPage({ handle }: UserBlogPageProps) {
   const profile = profileData.profiles[0];
   const posts = postsData?.posts || [];
 
+  async function handleDeletePost(postId: string) {
+    if (!isOwnBlog) return;
+
+    if (confirm('Are you sure you want to delete this post?')) {
+      try {
+        await db.transact(db.tx.posts[postId].delete());
+        // Refresh the current page
+        router.refresh();
+      } catch (err) {
+        console.error('Error deleting post:', err);
+        alert('Failed to delete post. Please try again.');
+      }
+    }
+  }
+
   return (
     <div className="container mx-auto p-4">
       <div className="flex justify-between items-center mb-6">
@@ -108,12 +124,20 @@ export default function UserBlogPage({ handle }: UserBlogPageProps) {
 
       <div className="mb-8">
         <div className="flex items-center space-x-4 mb-3">
-          <div
-            className="w-16 h-16 rounded-full flex items-center justify-center text-white text-2xl font-bold"
-            style={{ backgroundColor: stringToColor(profile.handle) }}
-          >
-            {profile.handle.charAt(0).toUpperCase()}
-          </div>
+          {profile.avatar ? (
+            <img
+              src={profile.avatar.url}
+              alt={`${profile.handle}'s avatar`}
+              className="w-16 h-16 rounded-full object-cover"
+            />
+          ) : (
+            <div
+              className="w-16 h-16 rounded-full flex items-center justify-center text-white text-2xl font-bold"
+              style={{ backgroundColor: stringToColor(profile.handle) }}
+            >
+              {profile.handle.charAt(0).toUpperCase()}
+            </div>
+          )}
           <div>
             <h1 className="text-3xl font-bold">@{profile.handle}'s Blog</h1>
             <p className="text-gray-600 mt-1">{profile.bio}</p>
@@ -227,30 +251,4 @@ export default function UserBlogPage({ handle }: UserBlogPageProps) {
       )}
     </div>
   );
-
-  async function handleDeletePost(postId: string) {
-    if (!isOwnBlog) return;
-
-    if (confirm('Are you sure you want to delete this post?')) {
-      try {
-        await db.transact(db.tx.posts[postId].delete());
-        // Refresh the current page
-        router.refresh();
-      } catch (err) {
-        console.error('Error deleting post:', err);
-        alert('Failed to delete post. Please try again.');
-      }
-    }
-  }
-}
-
-// Helper function to generate a consistent color from a string
-function stringToColor(str: string) {
-  let hash = 0;
-  for (let i = 0; i < str.length; i++) {
-    hash = str.charCodeAt(i) + ((hash << 5) - hash);
-  }
-
-  const hue = hash % 360;
-  return `hsl(${hue}, 65%, 55%)`;
 }

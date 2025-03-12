@@ -6,6 +6,10 @@ const _schema = i.schema({
     $users: i.entity({
       email: i.string().unique().indexed(),
     }),
+    $files: i.entity({
+      path: i.string().unique().indexed(),
+      url: i.string(),
+    }),
     profiles: i.entity({
       handle: i.string().unique().indexed(),
       bio: i.string(),
@@ -30,6 +34,11 @@ const _schema = i.schema({
     postAuthor: {
       forward: { on: 'posts', has: 'one', label: 'author' },
       reverse: { on: 'profiles', has: 'many', label: 'posts' },
+    },
+    // Link profile avatars (one-to-one)
+    profileAvatar: {
+      forward: { on: 'profiles', has: 'one', label: 'avatar' },
+      reverse: { on: '$files', has: 'one', label: 'profile' },
     },
   },
 })
