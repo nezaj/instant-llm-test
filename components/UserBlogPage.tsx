@@ -4,7 +4,6 @@ import { db, stringToColor } from '@/lib/db';
 import Link from 'next/link';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { SignOutButton } from '@/components/auth/AuthComponents';
 import SocialLinks from '@/components/SocialLinks';
 
 interface UserBlogPageProps {
@@ -13,7 +12,7 @@ interface UserBlogPageProps {
 
 export default function UserBlogPage({ handle }: UserBlogPageProps) {
   const router = useRouter();
-  const { isLoading: authLoading, user, error: authError } = db.useAuth();
+  const { isLoading: authLoading, user } = db.useAuth();
   const [page, setPage] = useState(1);
   const PAGE_SIZE = 10;
 
@@ -28,6 +27,7 @@ export default function UserBlogPage({ handle }: UserBlogPageProps) {
   });
 
   // Get the current user's profile to check if viewing own blog
+  // But only if the user is authenticated
   const { data: currentUserProfileData } = db.useQuery(
     user ? {
       profiles: {
@@ -39,9 +39,10 @@ export default function UserBlogPage({ handle }: UserBlogPageProps) {
   );
 
   const currentUserProfile = currentUserProfileData?.profiles?.[0];
-  const isOwnBlog = currentUserProfile?.handle === handle;
+  const isOwnBlog = user && currentUserProfile?.handle === handle;
 
   // Get the profile's posts with pagination
+  // For non-authenticated users, only show published posts
   const { isLoading: postsLoading, error: postsError, data: postsData } = db.useQuery(
     profileData?.profiles?.[0] ? {
       posts: {
@@ -65,10 +66,6 @@ export default function UserBlogPage({ handle }: UserBlogPageProps) {
     return <div className="flex justify-center p-8">Loading...</div>;
   }
 
-  if (authError) {
-    return <div className="text-red-500 p-4">Authentication error: {authError.message}</div>;
-  }
-
   if (profileError) {
     return <div className="text-red-500 p-4">Error loading profile: {profileError.message}</div>;
   }
@@ -78,7 +75,7 @@ export default function UserBlogPage({ handle }: UserBlogPageProps) {
       <div className="text-center p-8">
         <h1 className="text-2xl font-light mb-4">User not found</h1>
         <Link href="/users" className="text-gray-500 hover:text-gray-800">
-          Back to Users
+          Back to Discover
         </Link>
       </div>
     );
@@ -111,7 +108,7 @@ export default function UserBlogPage({ handle }: UserBlogPageProps) {
       <div className="flex justify-between items-center mb-6">
         <div className="flex items-center space-x-3">
           <Link href="/users" className="text-gray-500 hover:text-gray-800">
-            ← Back to Users
+            ← Back to Discover
           </Link>
           {isOwnBlog && (
             <Link href="/" className="text-gray-500 hover:text-gray-800">
@@ -119,7 +116,6 @@ export default function UserBlogPage({ handle }: UserBlogPageProps) {
             </Link>
           )}
         </div>
-        {user && <SignOutButton />}
       </div>
 
       <div className="mb-12">
@@ -180,7 +176,7 @@ export default function UserBlogPage({ handle }: UserBlogPageProps) {
       ) : (
         <div className="space-y-10">
           {posts.map((post) => (
-            <div key={post.id} className="space-y-2 pb-4">
+            <div key={post.id} className="border-b pb-8 last:border-b-0">
               <div className="flex justify-between">
                 <h2 className="text-xl font-normal">
                   <Link href={`/posts/${post.id}`} className="hover:text-gray-500 transition-colors">
@@ -200,7 +196,7 @@ export default function UserBlogPage({ handle }: UserBlogPageProps) {
                 {post.content.substring(0, 150)}
                 {post.content.length > 150 ? '...' : ''}
               </p>
-              <div className="mt-8 flex gap-4">
+              <div className="mt-3 flex gap-4">
                 <Link
                   href={`/posts/${post.id}`}
                   className="text-gray-500 hover:text-black"

@@ -421,6 +421,20 @@ export default function EditProfileForm() {
           </button>
         </div>
       </form>
+      <div className="mt-12 pt-6 border-t border-gray-100 text-center">
+        <button
+          type="button"
+          onClick={async () => {
+            if (confirm('Are you sure you want to sign out?')) {
+              await db.auth.signOut();
+              router.push("/");
+            }
+          }}
+          className="text-gray-500 hover:text-gray-800"
+        >
+          Sign Out
+        </button>
+      </div>
     </div>
   );
 }

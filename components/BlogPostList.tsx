@@ -4,7 +4,6 @@
 import { db, stringToColor } from '@/lib/db';
 import { useState } from 'react';
 import Link from 'next/link';
-import { SignOutButton } from './auth/AuthComponents';
 import SocialLinks from './SocialLinks';
 
 export default function BlogPostList() {
@@ -123,7 +122,6 @@ export default function BlogPostList() {
             >
               Create New Post
             </Link>
-            <SignOutButton />
           </div>
         </div>
 
@@ -181,7 +179,6 @@ export default function BlogPostList() {
           >
             Create New Post
           </Link>
-          <SignOutButton />
         </div>
       </div>
 

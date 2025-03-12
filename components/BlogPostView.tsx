@@ -4,7 +4,6 @@
 import { db } from '@/lib/db';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { SignOutButton } from './auth/AuthComponents';
 
 interface BlogPostViewProps {
   postId: string;
@@ -12,9 +11,9 @@ interface BlogPostViewProps {
 
 export default function BlogPostView({ postId }: BlogPostViewProps) {
   const router = useRouter();
-  const { isLoading: authLoading, user, error: authError } = db.useAuth();
+  const { isLoading: authLoading, user } = db.useAuth();
 
-  // Get user's profile to check ownership
+  // Get user's profile to check ownership (only if logged in)
   const { isLoading: profileLoading, data: profileData } = db.useQuery(
     user ? { profiles: { $: { where: { "$user.id": user.id } } } } : null
   );
@@ -33,8 +32,7 @@ export default function BlogPostView({ postId }: BlogPostViewProps) {
   const hasPostData = !isLoading && data?.posts?.[0];
   const postAuthorId = hasPostData ? data.posts[0].author?.id : null;
 
-  // Get the author's other posts for navigation (using the post's author, not the current user)
-  // Only include published posts if the viewer is not the author
+  // Fix for the loading issue: Only proceed with getting related posts when we have post data
   const { data: postsData, isLoading: postsLoading } = db.useQuery(
     hasPostData && postAuthorId ? {
       posts: {
@@ -42,7 +40,7 @@ export default function BlogPostView({ postId }: BlogPostViewProps) {
           where: {
             "author.id": postAuthorId,
             // If we're not the author, only show published posts for navigation
-            ...(profileData?.profiles?.[0]?.id !== postAuthorId ? { published: true } : {})
+            ...(!user || (profileData?.profiles?.[0]?.id !== postAuthorId) ? { published: true } : {})
           },
           order: { createdAt: 'desc' }
         }
@@ -50,12 +48,9 @@ export default function BlogPostView({ postId }: BlogPostViewProps) {
     } : null
   );
 
-  if (authLoading || profileLoading || isLoading || postsLoading) {
-    return <div className="flex justify-center p-8">Loading...</div>;
-  }
-
-  if (authError) {
-    return <div className="text-red-500 p-4">Authentication error: {authError.message}</div>;
+  // Simplify loading state handling to prevent infinite loading
+  if (isLoading) {
+    return <div className="flex justify-center p-8">Loading post...</div>;
   }
 
   if (error) {
@@ -84,18 +79,30 @@ export default function BlogPostView({ postId }: BlogPostViewProps) {
   }
 
   const post = data.posts[0];
+
+  // Check if this is a draft post and the user is not the author
+  if (!post.published && (!user || profileData?.profiles?.[0]?.id !== post.author?.id)) {
+    return (
+      <div className="text-center p-8">
+        <h1 className="text-2xl font-light mb-4">Post not available</h1>
+        <p className="mb-4 text-gray-500">This post is a draft and is not available for public viewing.</p>
+        <Link href="/" className="text-gray-600 hover:text-gray-900">
+          Return to Home
+        </Link>
+      </div>
+    );
+  }
+
   const authorProfile = post.author;
 
   // Check if the current user is the author of this post
-  const isOwner = authorProfile && profileData?.profiles?.[0]?.id === authorProfile.id;
+  const isOwner = user && authorProfile && profileData?.profiles?.[0]?.id === authorProfile.id;
 
   // Get the author's posts for navigation
   const authorPosts = postsData?.posts || [];
 
-  // Find current post index in the author's posts
+  // Only continue with navigation if we have author posts
   const currentIndex = authorPosts.findIndex(p => p.id === postId);
-
-  // Determine next and previous post
   const nextPost = currentIndex > 0 ? authorPosts[currentIndex - 1] : null;
   const prevPost = currentIndex < authorPosts.length - 1 ? authorPosts[currentIndex + 1] : null;
 
@@ -119,16 +126,21 @@ export default function BlogPostView({ postId }: BlogPostViewProps) {
   return (
     <div className="container max-w-2xl mx-auto px-4 py-8">
       <div className="flex justify-between items-center mb-10">
-        {isOwner ? (
-          <Link href="/" className="text-gray-500 hover:text-gray-800">
-            ← Back to My Posts
+        {authorProfile ?
+          <Link href={`/user/${authorProfile.handle}`} className="text-gray-500 hover:text-gray-800">
+            ← Back to @{authorProfile.handle}'s Posts
           </Link>
-        ) : (
-          <Link href={`/user/${authorProfile?.handle}`} className="text-gray-500 hover:text-gray-800">
-            ← Back to @{authorProfile?.handle}'s Posts
+          :
+          <Link href="/users" className="text-gray-500 hover:text-gray-800">
+            ← Back to Discover
+          </Link>
+        }
+
+        {!user && (
+          <Link href="/login" className="text-gray-500 hover:text-gray-800">
+            Sign In
           </Link>
         )}
-        {user && <SignOutButton />}
       </div>
 
       <article className="prose max-w-none">

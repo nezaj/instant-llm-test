@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import Link from 'next/link';
 import { db } from "@/lib/db";
 import { useRouter } from "next/navigation";
 
@@ -51,13 +52,43 @@ export function Login() {
   const [sentEmail, setSentEmail] = useState("");
 
   return (
-    <div className="flex justify-center items-center min-h-[calc(100vh-200px)]">
-      <div className="max-w-md w-full border p-8 rounded shadow-lg">
-        {!sentEmail ? (
-          <EmailStep onSendEmail={setSentEmail} />
-        ) : (
-          <CodeStep sentEmail={sentEmail} />
-        )}
+    <div className="min-h-[calc(100vh-160px)] flex">
+      {/* Left side - form */}
+      <div className="flex-1 flex items-center justify-center">
+        <div className="max-w-md w-full p-8">
+          {!sentEmail ? (
+            <EmailStep onSendEmail={setSentEmail} />
+          ) : (
+            <CodeStep sentEmail={sentEmail} />
+          )}
+        </div>
+      </div>
+
+      {/* Right side - decorative graphics */}
+      <div className="hidden md:block flex-1 bg-gradient-to-tr from-blue-100 to-blue-300 relative overflow-hidden">
+        <div className="absolute inset-0 opacity-20">
+          {/* Circles */}
+          <div className="absolute bottom-[20%] left-[10%] w-40 h-40 rounded-full bg-white"></div>
+          <div className="absolute top-[30%] right-[20%] w-24 h-24 rounded-full bg-black"></div>
+          <div className="absolute top-[60%] right-[15%] w-32 h-32 rounded-full bg-blue-600"></div>
+
+          {/* Abstract lines */}
+          <div className="absolute top-[25%] left-[10%] w-[80%] h-[1px] bg-black transform -rotate-12"></div>
+          <div className="absolute top-[30%] left-[10%] w-[80%] h-[1px] bg-black transform -rotate-[8deg]"></div>
+          <div className="absolute top-[80%] left-[5%] w-[90%] h-[1px] bg-black transform rotate-12"></div>
+
+          {/* Stars/dots */}
+          {[...Array(12)].map((_, i) => (
+            <div
+              key={i}
+              className="absolute w-1 h-1 bg-black rounded-full"
+              style={{
+                top: `${Math.random() * 100}%`,
+                left: `${Math.random() * 100}%`,
+              }}
+            ></div>
+          ))}
+        </div>
       </div>
     </div>
   );
@@ -86,7 +117,7 @@ function EmailStep({ onSendEmail }: { onSendEmail: (email: string) => void }) {
   return (
     <form onSubmit={handleSubmit} className="flex flex-col space-y-6">
       <div>
-        <h2 className="text-2xl font-bold mb-2">Sign In</h2>
+        <h2 className="text-3xl font-light mb-2">Sign In</h2>
         <p className="text-gray-600">
           Enter your email, and we'll send you a verification code. We'll create
           an account for you if you don't already have one.
@@ -96,7 +127,7 @@ function EmailStep({ onSendEmail }: { onSendEmail: (email: string) => void }) {
       {error && <div className="text-red-500">{error}</div>}
 
       <div>
-        <label htmlFor="email" className="block mb-1 font-medium">
+        <label htmlFor="email" className="block mb-2 font-light">
           Email
         </label>
         <input
@@ -104,7 +135,7 @@ function EmailStep({ onSendEmail }: { onSendEmail: (email: string) => void }) {
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="w-full border border-gray-300 rounded px-3 py-2"
+          className="w-full border border-gray-200 rounded-sm px-3 py-2 focus:outline-none focus:border-gray-400"
           placeholder="you@example.com"
           required
           autoFocus
@@ -114,13 +145,19 @@ function EmailStep({ onSendEmail }: { onSendEmail: (email: string) => void }) {
       <button
         type="submit"
         disabled={isLoading}
-        className={`px-4 py-2 rounded font-medium ${isLoading
-          ? "bg-gray-400 cursor-not-allowed"
-          : "bg-blue-500 hover:bg-blue-600 text-white"
+        className={`px-4 py-2 ${isLoading
+          ? "bg-gray-300 cursor-not-allowed"
+          : "bg-gray-800 hover:bg-black text-white"
           }`}
       >
         {isLoading ? "Sending..." : "Send Code"}
       </button>
+
+      <div className="text-center mt-4">
+        <Link href="/" className="text-gray-500 hover:text-gray-800">
+          Back to home
+        </Link>
+      </div>
     </form>
   );
 }
@@ -174,7 +211,7 @@ function CodeStep({ sentEmail }: { sentEmail: string }) {
   return (
     <form onSubmit={handleSubmit} className="flex flex-col space-y-6">
       <div>
-        <h2 className="text-2xl font-bold mb-2">Enter Verification Code</h2>
+        <h2 className="text-3xl font-light mb-2">Enter Verification Code</h2>
         <p className="text-gray-600">
           We sent a code to <strong>{sentEmail}</strong>. Please check your email and enter the code below.
         </p>
@@ -183,7 +220,7 @@ function CodeStep({ sentEmail }: { sentEmail: string }) {
       {error && <div className="text-red-500">{error}</div>}
 
       <div>
-        <label htmlFor="code" className="block mb-1 font-medium">
+        <label htmlFor="code" className="block mb-2 font-light">
           Verification Code
         </label>
         <input
@@ -191,7 +228,7 @@ function CodeStep({ sentEmail }: { sentEmail: string }) {
           type="text"
           value={code}
           onChange={(e) => setCode(e.target.value)}
-          className="w-full border border-gray-300 rounded px-3 py-2"
+          className="w-full border border-gray-200 rounded-sm px-3 py-2 focus:outline-none focus:border-gray-400"
           placeholder="Enter your code..."
           required
           autoFocus
@@ -201,31 +238,37 @@ function CodeStep({ sentEmail }: { sentEmail: string }) {
       <button
         type="submit"
         disabled={isLoading}
-        className={`px-4 py-2 rounded font-medium ${isLoading
-          ? "bg-gray-400 cursor-not-allowed"
-          : "bg-blue-500 hover:bg-blue-600 text-white"
+        className={`px-4 py-2 ${isLoading
+          ? "bg-gray-300 cursor-not-allowed"
+          : "bg-gray-800 hover:bg-black text-white"
           }`}
       >
         {isLoading ? "Verifying..." : "Verify Code"}
       </button>
+
+      <div className="text-center mt-4">
+        <button
+          type="button"
+          onClick={() => window.location.reload()}
+          className="text-gray-500 hover:text-gray-800"
+        >
+          Try a different email
+        </button>
+      </div>
     </form>
   );
 }
 
-export function SignOutButton() {
-  const router = useRouter();
+export function PublicRoute({ children }: { children: React.ReactNode }) {
+  const { isLoading: authLoading } = db.useAuth();
 
-  const handleSignOut = async () => {
-    await db.auth.signOut();
-    router.push("/login");
-  };
+  // For public routes, we don't need to check for profiles or redirect
+  // We just need to pass through the children with the auth context
 
-  return (
-    <button
-      onClick={handleSignOut}
-      className="text-sm text-gray-500 hover:text-gray-800"
-    >
-      Sign Out
-    </button>
-  );
+  if (authLoading) {
+    return <div className="flex justify-center p-8">Loading...</div>;
+  }
+
+  // Always render children, whether user is authenticated or not
+  return <>{children}</>;
 }

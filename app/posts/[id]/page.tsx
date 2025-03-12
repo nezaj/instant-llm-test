@@ -1,11 +1,14 @@
+// app/posts/[id]/page.tsx
 "use client";
 import { use } from 'react';
 import BlogPostView from '@/components/BlogPostView';
+import { PublicRoute } from '@/components/auth/AuthComponents';
 
 export default function PostPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
-  // Note: We don't wrap this with AuthGuard because we want to allow
-  // public viewing of published posts, but the component itself
-  // will handle authentication for drafts
-  return <BlogPostView postId={id} />;
+  return (
+    <PublicRoute>
+      <BlogPostView postId={id} />
+    </PublicRoute>
+  );
 }

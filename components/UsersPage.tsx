@@ -3,11 +3,10 @@
 import { db, stringToColor } from '@/lib/db';
 import Link from 'next/link';
 import { useState } from 'react';
-import { SignOutButton } from '@/components/auth/AuthComponents';
 import SocialLinks from './SocialLinks';
 
 export default function UsersPage() {
-  const { isLoading: authLoading, user, error: authError } = db.useAuth();
+  const { isLoading: authLoading, user } = db.useAuth();
   const [page, setPage] = useState(1);
   const PAGE_SIZE = 10;
 
@@ -42,10 +41,6 @@ export default function UsersPage() {
     return <div className="flex justify-center p-8">Loading...</div>;
   }
 
-  if (authError) {
-    return <div className="text-red-500 p-4">Authentication error: {authError.message}</div>;
-  }
-
   if (error) {
     return <div className="text-red-500 p-4">Error loading users: {error.message}</div>;
   }
@@ -58,12 +53,6 @@ export default function UsersPage() {
         <div>
           <h1 className="text-3xl font-light">Discover Blogs</h1>
           <p className="text-gray-500">Find and follow other bloggers</p>
-        </div>
-        <div className="flex items-center gap-3">
-          <Link href="/" className="text-gray-500 hover:text-gray-800">
-            My Blog
-          </Link>
-          {user && <SignOutButton />}
         </div>
       </div>
 
