@@ -8,7 +8,7 @@ import SocialLinks from './SocialLinks';
 export default function UsersPage() {
   const { isLoading: authLoading, user } = db.useAuth();
   const [page, setPage] = useState(1);
-  const PAGE_SIZE = 10;
+  const PAGE_SIZE = 9;
 
   // Get current user's profile to identify their own blog
   const { data: currentUserProfileData } = db.useQuery(
